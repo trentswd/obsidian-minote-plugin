@@ -1,94 +1,63 @@
-# Obsidian Sample Plugin
+# Obsidian Minote Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+[![](https://github.com/emac/obsidian-minote-plugin/actions/workflows/CI.yml/badge.svg)](https://github.com/emac/obsidian-minote-plugin/actions/workflows/CI.yml)
+[![Release Obsidian plugin](https://github.com/emac/obsidian-minote-plugin/actions/workflows/release.yml/badge.svg)](https://github.com/emac/obsidian-minote-plugin/actions/workflows/release.yml)
+[![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/main/LICENSE)
+[![Github all releases](https://img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases/)
+[![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/)](https://github.com/emac/obsidian-minote-plugin/releases)
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+Obsidian小米笔记插件是一个社区插件，用来将小米笔记转换为markdown格式保存到Obsidian指定的文件夹中，初次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## 更新历史
+https://github.com/emac/obsidian-minote-plugin/releases
 
-## First time developing plugins?
 
-Quick starting guide for new plugin devs:
+## 功能
+- 按目录存放笔记
+- 自动下载笔记中的图片，并将引用方式替换成Markdown格式
+- 替换`<background>`标签为`<span>`标签，以支持文字高亮
+- 去除多余的`<text>`标签
+- 兼容旧版本无标题笔记（根据首行内容和笔记ID自动生成标题）
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
 
-## Releasing new releases
+## 安装方法
+插件市场直接搜索`minote`，找到`Minote Plugin`点击`install`安装，安装完成后点击`Enable`使插件启用，也可以直接在[release](https://github.com/emac/obsidian-minote-plugin/releases)页面手动下载。
+## 设置
+1. 打开Obsidian点击`设置`进入设置界面，找到`Minote`进入到插件设置页面
+2. 点击右侧`登录`按钮，在弹出的登录页面扫码登录，登录完成后，会显示个人昵称
+3. 注销登录可以清除Obsidian插件的Cookie信息，注销方法，和网页版小米云服务一样，右上角点击头像，点击退出
+4. 设置笔记保存位置
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+## 使用
+⚠️ 本插件是覆盖式更新，请不要在同步的文件里修改内容。
 
-## Adding your plugin to the community plugin list
+点击左侧Ribbon上的小米笔记按钮，或者command+P(windows ctrl+P)调出Command Pattle 输入Minote 找到`Sync Minote command`即可同步。
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
 
-## How to use
+## 已知问题
+- 长期不使用本插件Cookie可能会失效，需要重新登录。
+- 偶尔可能会有网络连接问题，重新点击同步即可，已同步的笔记不会再次更新。
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
 
-## Manually installing the plugin
+## TODO
+- [ ] 支持思维笔记
+- [ ] 支持移动端
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+## 赞赏
+<img src="https://cloud.githubusercontent.com/assets/758420/20865022/55350f8c-ba41-11e6-8207-02657ddfd437.png" width=30% />
 
-## Funding URL
 
-You can include funding URLs where people who use your plugin can financially support it.
+## 免责声明
+本程序没有爬取任何书籍内容，只提供登录用户的图书以及笔记信息，没有侵犯书籍作者版权和微信读书官方利益。
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+## 感谢
+- [Weread Plugin](https://github.com/zhaohongxuan/obsidian-weread-plugin)
+- [minote-Obsidian](https://github.com/yulittlemoon/minote-Obsidian)
+- [Obsidian Plugin Developer Docs](https://marcus.se.net/obsidian-plugin-docs/)
 
-If you have multiple URLs, you can also do:
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+## Supported By
+<a href="https://jb.gg/OpenSourceSupport" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" height='128' style='border:0px;height:128px;' alt="JetBrains Logo (Main) logo."></a>
