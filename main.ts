@@ -1,134 +1,98 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+// 插件主函数
+import { Menu, Notice, Platform, Plugin } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
+import { settingsStore } from './src/settings';
+import { MinoteSettingTab } from './src/settingTab';
+import syncer from './src/syncer';
 
-interface MyPluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class MinotePlugin extends Plugin {
+	private syncing = false;
 
 	async onload() {
-		await this.loadSettings();
+		console.log('loading minote plugin');
+		settingsStore.initialize(this);
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+		const ribbonEl = this.addRibbonIcon('book-open', '同步小米笔记', (event) => {
+			if (event.button === 0) {
+				this.startSync();
+			}
 		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		ribbonEl.addEventListener('contextmenu', (event: MouseEvent) => {
+			event.preventDefault();
+			event.stopPropagation(); // 阻止事件传播
 
-		// This adds a simple command that can be triggered anywhere
+			const preventDefaultMouseDown = (mouseDownEvent: MouseEvent) => {
+				mouseDownEvent.preventDefault();
+			};
+
+			// 额外阻止mousedown事件的默认行为
+			window.addEventListener('mousedown', preventDefaultMouseDown);
+
+			const menu = new Menu();
+			menu.addItem((item) =>
+				item
+					.setTitle('同步小米笔记')
+					.setIcon('refresh-ccw')
+					.onClick(() => {
+						this.startSync();
+					})
+			);
+
+			menu.addItem((item) =>
+				item
+					.setTitle('强制小米笔记')
+					.setIcon('refresh-ccw-dot')
+					.onClick(() => {
+						this.startSync(true);
+					})
+			);
+
+			menu.showAtMouseEvent(event);
+			menu.onHide(() => {
+				window.removeEventListener('mousedown', preventDefaultMouseDown);
+			});
+		});
+
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
+			id: 'sync-minote-command',
+			name: '同步小米笔记',
 			callback: () => {
-				new SampleModal(this.app).open();
+				this.startSync();
 			}
 		});
-		// This adds an editor command that can perform some operation on the current editor instance
+
 		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
+			id: 'Force-sync-minote-command',
+			name: '强制同步小米笔记',
+			callback: () => {
+				this.startSync(true);
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new MinoteSettingTab(this.app, this));
+	}
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+	async startSync(force = false) {
+		if (this.syncing) {
+			new Notice('正在同步小米笔记，请勿重复点击');
+			return;
+		}
+		this.syncing = true;
+		try {
+			await this.syncer.sync(force);
+			console.log('sync MI notes success');
+		} catch (e) {
+			if (Platform.isDesktopApp) {
+				new Notice('同步小米笔记异常，请打开控制台查看详情');
+			}
+			console.error('failed to sync MI notes', e);
+		} finally {
+			this.syncing = false;
+		}
 	}
 
 	onunload() {
-
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+		console.log('unloading minote plugin', new Date().toLocaleString());
 	}
 }
