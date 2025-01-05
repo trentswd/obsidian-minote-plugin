@@ -3,7 +3,6 @@ import { get } from 'svelte/store';
 import { Cookie, parse, splitCookiesString } from 'set-cookie-parser';
 
 import { settingsStore } from './settings';
-import { getCookieString } from './utils/cookiesUtil';
 
 export default class ApiManager {
 	readonly baseUrl: string = 'https://i.weread.qq.com';
@@ -14,7 +13,7 @@ export default class ApiManager {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36',
 			'Accept-Encoding': 'gzip, deflate, br',
 			'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-			Cookie: getCookieString(get(settingsStore).cookies)
+			Cookie: get(settingsStore).cookies
 		};
 	}
 

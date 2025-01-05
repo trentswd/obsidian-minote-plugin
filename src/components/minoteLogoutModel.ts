@@ -18,16 +18,16 @@ export default class MinoteLogoutModel {
 			show: false
 		});
 		this.modal.once('ready-to-show', () => {
-			this.modal.setTitle('注销小米云服务，点击头像选择->退出登录');
+			this.modal.setTitle('注销小米云服务，点击头像选择【退出】');
 			this.modal.show();
 		});
 		const session = this.modal.webContents.session;
 		const filter = {
-			urls: ['https://logout.account.xiaomi.com/logout']
+			urls: ['https://logout.account.xiaomi.com/logout*']
 		};
 		session.webRequest.onCompleted(filter, (details) => {
 			if (details.statusCode == 200) {
-				console.log('minote logout success, clear cookies...');
+				console.log('[minote plugin] logout success');
 				settingsStore.actions.clearCookies();
 				this.settingTab.display();
 				this.modal.close();

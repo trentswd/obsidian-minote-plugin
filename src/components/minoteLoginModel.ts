@@ -7,6 +7,7 @@ import { MinoteSettingTab } from '../settingTab';
 export default class MinoteLoginModel {
 	private modal: any;
 	private settingTab: MinoteSettingTab;
+	private profileRetrieved: boolean = false;
 
 	constructor(settingTab: MinoteSettingTab) {
 		this.settingTab = settingTab;
@@ -25,36 +26,73 @@ export default class MinoteLoginModel {
 			this.modal.show();
 		});
 
-		const session = this.modal.webContents.session;
+		const webContents = this.modal.webContents;
+		const session = webContents.session;
 
 		const loginFilter = {
-			urls: ['https://account.xiaomi.com/pass/serviceLoginAuth2']
+			urls: ['https://account.xiaomi.com/fe/service/account?cUserId=*', 'https://i.mi.com/status/lite/profile?ts=*']
 		};
-
-		session.webRequest.onCompleted(loginFilter, (details) => {
-			if (details.statusCode == 200) {
-				console.log('minote login success');
+		session.webRequest.onCompleted(loginFilter, async (details) => {
+			console.log('[minote plugin] onCompleted details: ', details);
+			if (details.url.startsWith('https://account.xiaomi.com/fe/service/account')) {
+				if (details.statusCode == 200) {
+					console.log('[minote plugin] login success');
+					this.modal.loadURL('https://i.mi.com/note/h5')
+				}
+			}
+			if (details.url.startsWith('https://i.mi.com/status/lite/profile')) {
+				if (details.statusCode == 200) {
+					const startTime = Date.now();
+					while (!this.profileRetrieved && Date.now() - startTime < 3000) {
+						await new Promise(resolve => setTimeout(resolve, 1000));
+					}
+					settingTab.display();
+					this.modal.close();
+				} else {
+					this.modal.reload();
+				}
 			}
 		});
 
-		const filter = {
-			urls: ['https://i.mi.com']
+		const cookiesFilter = {
+			urls: ['https://i.mi.com/status/lite/profile?ts=*']
 		};
-		session.webRequest.onSendHeaders(filter, (details) => {
+		session.webRequest.onSendHeaders(cookiesFilter, (details) => {
+			console.log('[minote plugin] onSendHeaders details: ', details);
 			const cookies = details.requestHeaders['Cookie'];
 			if (cookies) {
 				settingsStore.actions.setCookies(cookies);
-				settingTab.display();
-				this.modal.close();
 			} else {
 				this.modal.reload();
 			}
 		});
+
+		this.listenOnProfileResponse(webContents);
+	}
+
+	listenOnProfileResponse(webContents: any) {
+		try {
+			webContents.debugger.attach('1.3');
+			webContents.debugger.on('message', (event, method, params) => {
+				if (method === 'Network.responseReceived') {
+					if (params.response.url.startsWith('https://i.mi.com/status/lite/profile')) {
+						webContents.debugger.sendCommand('Network.getResponseBody', { requestId: params.requestId }).then((response) => {
+							const profile = JSON.parse(response.body);
+							settingsStore.actions.setUser(profile.data.nickname);
+							this.profileRetrieved = true;
+						});
+					}
+				}
+			});
+			webContents.debugger.sendCommand('Network.enable');
+		} catch (err) {
+			console.log('[minote plugin] debugger attach failed: ', err);
+		}
 	}
 
 	async doLogin() {
 		try {
-			await this.modal.loadURL('https://i.mi.com');
+			await this.modal.loadURL('https://account.xiaomi.com/fe/service/login/qrcode');
 		} catch (error) {
 			console.log(error);
 			new Notice('加载小米云服务登录页面失败');

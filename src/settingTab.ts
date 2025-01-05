@@ -50,8 +50,8 @@ export class MinoteSettingTab extends PluginSettingTab {
     private showLogout(): void {
 		document.createRange().createContextualFragment;
 		const desc = document.createRange().createContextualFragment(
-			`1. 登录：点击登录按钮，在弹出页面点击【使用小米账号登录】；
-             2. 注销：点击注销，在弹出页面右上角点击头像，下拉菜单选择【退出】`
+			`1. 登录：点击登录按钮，在弹出页面【扫码登录】<br>
+             2. 注销：点击注销按钮，在弹出页面右上角点击头像，下拉菜单选择【退出】`
 		);
 
 		new Setting(this.containerEl)

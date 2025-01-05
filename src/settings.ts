@@ -2,7 +2,6 @@
 import { writable } from 'svelte/store';
 
 import MinotePlugin from 'main';
-import { parseCookies } from './utils/cookiesUtil';
 
 interface MinotePluginSettings {
 	cookies: string;
@@ -27,11 +26,7 @@ const createSettingsStore = () => {
 		const data = Object.assign({}, DEFAULT_SETTINGS, await plugin.loadData());
 		const settings: MinotePluginSettings = { ...data };
 
-		console.log('--------init cookie------', settings.cookies);
-		if (settings.cookies) {
-			setUser(settings.cookies);
-		}
-
+		console.log('[minote plugin] init cookie: ', settings.cookies);
 		store.set(settings);
 		_plugin = plugin;
 	};
@@ -46,7 +41,7 @@ const createSettingsStore = () => {
 	});
 
 	const clearCookies = () => {
-		console.log('[minote plugin] cookie已失效，清理cookie...');
+		console.log('[minote plugin] clearing cookie...');
 		store.update((state) => {
 			state.cookies = '';
 			state.isCookieValid = false;
@@ -56,27 +51,20 @@ const createSettingsStore = () => {
 	};
 
 	const setCookies = (cookies: string) => {
+		console.log('[minote plugin] setting cookies: ', cookies);
 		store.update((state) => {
 			state.cookies = cookies;
 			state.isCookieValid = true;
-			setUser(cookies);
 			return state;
 		});
 	};
 
-	const setUser = (cookies: string) => {
-		for (const cookie of parseCookies(cookies)) {
-			// todo: 替换userId为真实的用户名
-			if (cookie.name == 'userId') {
-				if (cookie.value !== '') {
-					console.log('[minote plugin] setting user name=>', cookie.value);
-					store.update((state) => {
-						state.user = cookie.value;
-						return state;
-					});
-				}
-			}
-		}
+	const setUser = (user: string) => {
+		console.log('[minote plugin] setting user name: ', user);
+		store.update((state) => {
+			state.user = user;
+			return state;
+		});
 	};
 
 	const setNoteLocationFolder = (value: string) => {
@@ -92,6 +80,7 @@ const createSettingsStore = () => {
 		actions: {
 			setNoteLocationFolder,
 			setCookies,
+			setUser,
 			clearCookies,
 		}
 	}

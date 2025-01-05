@@ -9,7 +9,7 @@ export default class MinotePlugin extends Plugin {
 	private syncing = false;
 
 	async onload() {
-		console.log('loading minote plugin');
+		console.log('[minote plugin] loading...');
 		settingsStore.initialize(this);
 
 		const ribbonEl = this.addRibbonIcon('book-open', '同步小米笔记', (event) => {
@@ -93,6 +93,6 @@ export default class MinotePlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('unloading minote plugin', new Date().toLocaleString());
+		console.log('[minote plugin] unloading...');
 	}
 }
