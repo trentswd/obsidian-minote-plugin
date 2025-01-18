@@ -23,7 +23,7 @@ export default class MinotePlugin extends Plugin {
 		const minoteApi = new MinoteApi();
 		this.noteSyncer = new NoteSyncer(fileManager, minoteApi);
 
-		const ribbonEl = this.addRibbonIcon('book-open', '同步小米笔记', (event) => {
+		const ribbonEl = this.addRibbonIcon('cloud-download', '同步小米笔记', (event) => {
 			if (event.button === 0) {
 				this.startSync();
 			}
@@ -52,7 +52,7 @@ export default class MinotePlugin extends Plugin {
 
 			menu.addItem((item) =>
 				item
-					.setTitle('强制小米笔记')
+					.setTitle('强制同步小米笔记')
 					.setIcon('refresh-ccw-dot')
 					.onClick(() => {
 						this.startSync(true);
