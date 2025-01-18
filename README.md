@@ -1,10 +1,10 @@
-# Obsidian Minote Plugin
+# Obsidian Plugin: 小米笔记同步插件
 
 [![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/main/LICENSE)
 [![Github all releases](https://img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases)
 [![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/)](https://github.com/emac/obsidian-minote-plugin/releases)
 
-Obsidian 小米笔记插件是一个社区插件，用来将小米笔记转换为 Markdown 格式保存到 Obsidian 指定的文件夹中。首次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
+Obsidian 小米笔记同步插件是一个社区插件，用来将小米笔记转换为 Markdown 格式保存到 Obsidian 指定的文件夹中。首次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
 
 ## 更新历史
 https://github.com/emac/obsidian-minote-plugin/releases
@@ -20,11 +20,11 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 安装方法
-插件市场直接搜索 `minote`，找到 `Minote Plugin` 点击 `install` 安装，安装完成后点击 `Enable` 使插件启用，也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载。
+插件市场直接搜索 `minote`，找到 `Minote Sync` 点击 `install` 安装，安装完成后点击 `Enable` 使插件启用，也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载。
 
 
 ## 设置
-1. 打开 Obsidian 点击 `设置` 进入设置界面，找到 `Minote` 进入到插件设置页面
+1. 打开 Obsidian 点击 `设置` 进入设置界面，找到 `Minote Sync` 进入到插件设置页面
 2. 点击右侧 `登录` 按钮，在弹出的登录页面扫码登录，登录完成后，会显示个人昵称
 3. 注销登录可以清除插件的 Cookie 信息，注销方法和网页版小米云服务一样，右上角点击头像，点击退出
 4. 设置笔记保存位置，默认保存到 `/minote` 文件夹，可以修改为其他位置
@@ -55,6 +55,50 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 感谢
+- [Weread Plugin](https://github.com/zhaohongxuan/obsidian-weread-plugin)
+- [minote-Obsidian](https://github.com/yulittlemoon/minote-Obsidian)
+- [Obsidian Plugin Developer Docs](https://marcus.se.net/obsidian-plugin-docs/)
+
+---
+
+# Obsidian Plugin: Minote Sync Plugin
+
+This community plugin syncs your Xiaomi notes to Obsidian by converting them to Markdown format and saving them in a specified folder. The initial sync might be slow if you have many notes, but subsequent syncs will only update changed notes incrementally.
+
+## Features
+- Organizes notes in folders
+- Automatically downloads images from notes and converts references to Markdown format
+- Replaces `<background>` tags with `<span>` tags to support text highlighting
+- Removes redundant `<text>` tags
+- Compatible with old version untitled notes (auto-generates titles based on first line and note ID)
+- Supports force sync mode for full overwrite updates
+
+## Installation
+Search for `minote` in the plugin marketplace, find `Minote Sync` and click `install`. Enable the plugin after installation. You can also manually download from the [release](https://github.com/emac/obsidian-minote-plugin/releases) page.
+
+## Settings
+1. Open Obsidian settings, find `Minote Sync` in the plugin settings
+2. Click the `Login` button and scan the QR code in the popup login page
+3. To logout, clear the plugin's Cookie information following the same process as the web version
+4. Set note storage location (default is `/minote` folder)
+
+## Usage
+⚠️ This plugin uses overwrite updates. Please don't modify content in synced files.
+
+Click the Xiaomi notes button(![](/cloud-download.png)) in the left Ribbon, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote`.
+
+## Known Issues
+- Cookie may expire after periods of inactivity, requiring manual refresh in plugin settings
+- Occasional network connection issues may occur; simply retry sync (already synced notes won't update again)
+
+## TODO
+- [ ] Support mind maps
+- [ ] Support mobile devices
+
+## Disclaimer
+All note content comes from Xiaomi Cloud Services. User login authorizes this plugin to sync notes to local storage.
+
+## Acknowledgments
 - [Weread Plugin](https://github.com/zhaohongxuan/obsidian-weread-plugin)
 - [minote-Obsidian](https://github.com/yulittlemoon/minote-Obsidian)
 - [Obsidian Plugin Developer Docs](https://marcus.se.net/obsidian-plugin-docs/)
