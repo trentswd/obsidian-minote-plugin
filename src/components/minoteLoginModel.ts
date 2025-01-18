@@ -1,4 +1,8 @@
-// 登录页面
+/**
+ * @file 登录页面
+ * @author Emac
+ * @date 2025-01-05
+ */
 import { Notice } from 'obsidian';
 
 import { settingsStore } from '../settings';
@@ -54,14 +58,14 @@ export default class MinoteLoginModel {
 			}
 		});
 
-		const cookiesFilter = {
+		const cookieFilter = {
 			urls: ['https://i.mi.com/status/lite/profile?ts=*']
 		};
-		session.webRequest.onSendHeaders(cookiesFilter, (details) => {
+		session.webRequest.onSendHeaders(cookieFilter, (details) => {
 			console.log('[minote plugin] onSendHeaders details: ', details);
-			const cookies = details.requestHeaders['Cookie'];
-			if (cookies) {
-				settingsStore.actions.setCookies(cookies);
+			const cookie = details.requestHeaders['Cookie'];
+			if (cookie) {
+				settingsStore.actions.setCookie(cookie);
 			} else {
 				this.modal.reload();
 			}
@@ -91,12 +95,7 @@ export default class MinoteLoginModel {
 	}
 
 	async doLogin() {
-		try {
-			await this.modal.loadURL('https://account.xiaomi.com/fe/service/login/qrcode');
-		} catch (error) {
-			console.log(error);
-			new Notice('加载小米云服务登录页面失败');
-		}
+		await this.modal.loadURL('https://account.xiaomi.com/fe/service/login/qrcode');
 	}
 
 	onClose() {

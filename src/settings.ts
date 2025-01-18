@@ -1,20 +1,26 @@
-// 插件配置
+/**
+ * @file 插件配置
+ * @author Emac
+ * @date 2025-01-05
+ */
 import { writable } from 'svelte/store';
 
 import MinotePlugin from 'main';
 
 interface MinotePluginSettings {
-	cookies: string;
+	cookie: string;
 	isCookieValid: boolean;
-    user: string;
-    noteLocation: string;
+	user: string;
+	noteLocation: string;
+	lastTimeSynced: SyncInfo[];
 };
 
 const DEFAULT_SETTINGS: MinotePluginSettings = {
-	cookies: '',
+	cookie: '',
 	isCookieValid: false,
-    user: '',
-    noteLocation: '/'
+	user: '',
+	noteLocation: '/',
+	lastTimeSynced: [],
 };
 
 const createSettingsStore = () => {
@@ -26,34 +32,32 @@ const createSettingsStore = () => {
 		const data = Object.assign({}, DEFAULT_SETTINGS, await plugin.loadData());
 		const settings: MinotePluginSettings = { ...data };
 
-		console.log('[minote plugin] init cookie: ', settings.cookies);
+		console.log('[minote plugin] init cookie: ', settings.cookie);
 		store.set(settings);
 		_plugin = plugin;
 	};
 
 	store.subscribe(async (settings) => {
 		if (_plugin) {
-			const data = {
-				...settings
-			};
+			const data = { ...settings };
 			await _plugin.saveData(data);
 		}
 	});
 
-	const clearCookies = () => {
+	const clearCookie = () => {
 		console.log('[minote plugin] clearing cookie...');
 		store.update((state) => {
-			state.cookies = '';
+			state.cookie = '';
 			state.isCookieValid = false;
 			state.user = '';
 			return state;
 		});
 	};
 
-	const setCookies = (cookies: string) => {
-		console.log('[minote plugin] setting cookies: ', cookies);
+	const setCookie = (cookie: string) => {
+		console.log('[minote plugin] setting cookie: ', cookie);
 		store.update((state) => {
-			state.cookies = cookies;
+			state.cookie = cookie;
 			state.isCookieValid = true;
 			return state;
 		});
@@ -73,15 +77,31 @@ const createSettingsStore = () => {
 			return state;
 		});
 	};
-    
+
+	const clearLastTimeSynced = () => {
+		store.update((state) => {
+			state.lastTimeSynced = [];
+			return state;
+		});
+	};
+
+	const setLastTimeSynced = (synced: SyncInfo[]) => {
+		store.update((state) => {
+			state.lastTimeSynced = synced;
+			return state;
+		});
+	};
+
 	return {
 		subscribe: store.subscribe,
 		initialize,
 		actions: {
 			setNoteLocationFolder,
-			setCookies,
+			setCookie,
 			setUser,
-			clearCookies,
+			clearCookie,
+			clearLastTimeSynced,
+			setLastTimeSynced,
 		}
 	}
 };

@@ -1,4 +1,8 @@
-// 注销页面
+/**
+ * @file 注销页面
+ * @author Emac
+ * @date 202-01-05
+ */
 import { settingsStore } from '../settings';
 import { MinoteSettingTab } from '../settingTab';
 
@@ -28,7 +32,7 @@ export default class MinoteLogoutModel {
 		session.webRequest.onCompleted(filter, (details) => {
 			if (details.statusCode == 200) {
 				console.log('[minote plugin] logout success');
-				settingsStore.actions.clearCookies();
+				settingsStore.actions.clearCookie();
 				this.settingTab.display();
 				this.modal.close();
 			}

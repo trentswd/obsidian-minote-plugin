@@ -1,4 +1,8 @@
-// 插件配置页面
+/**
+ * @file 插件配置页面
+ * @author Emac
+ * @date 2025-01-05
+ */
 import { PluginSettingTab, Setting, App, Platform, Notice } from 'obsidian';
 import { get } from 'svelte/store';
 import pickBy from 'lodash.pickby';
@@ -70,16 +74,16 @@ export class MinoteSettingTab extends PluginSettingTab {
 			})
 			.addButton((button) => {
 				return button
-					.setButtonText('拷贝Cookie')
+					.setButtonText('拷贝Settings')
 					.setCta()
 					.onClick(async () => {
-						navigator.clipboard.writeText(get(settingsStore).cookies).then(
+						navigator.clipboard.writeText(JSON.stringify(get(settingsStore))).then(
 							function () {
-								new Notice('拷贝Cookie到剪切板成功！');
+								new Notice('拷贝Settings到剪切板成功！');
 							},
 							function (error) {
-								new Notice('拷贝Cookie到剪切板失败！');
-								console.error('拷贝小米云服务Cookie失败', error);
+								new Notice('拷贝Settings到剪切板失败！');
+								console.error('[minote plugin] failed to copy settings to clipboard', error);
 							}
 						);
 					});

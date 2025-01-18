@@ -1,16 +1,27 @@
-// 插件主函数
+/**
+ * @file 插件主函数
+ * @author Emac
+ * @date 2025-01-05
+ */
 import { Menu, Notice, Platform, Plugin } from 'obsidian';
 
 import { settingsStore } from './src/settings';
 import { MinoteSettingTab } from './src/settingTab';
-import syncer from './src/syncer';
+import FileManager from './src/fileManager';
+import MinoteApi from './src/minoteApi';
+import NoteSyncer from './src/noteSyncer';
 
 export default class MinotePlugin extends Plugin {
+	private noteSyncer: NoteSyncer;
 	private syncing = false;
 
 	async onload() {
 		console.log('[minote plugin] loading...');
-		settingsStore.initialize(this);
+		await settingsStore.initialize(this);
+
+		const fileManager = new FileManager(this.app.vault, this.app.metadataCache);
+		const minoteApi = new MinoteApi();
+		this.noteSyncer = new NoteSyncer(fileManager, minoteApi);
 
 		const ribbonEl = this.addRibbonIcon('book-open', '同步小米笔记', (event) => {
 			if (event.button === 0) {
@@ -63,7 +74,7 @@ export default class MinotePlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'Force-sync-minote-command',
+			id: 'force-sync-minote-command',
 			name: '强制同步小米笔记',
 			callback: () => {
 				this.startSync(true);
@@ -80,13 +91,13 @@ export default class MinotePlugin extends Plugin {
 		}
 		this.syncing = true;
 		try {
-			await this.syncer.sync(force);
-			console.log('sync MI notes success');
+			await this.noteSyncer.sync(force);
+			console.log('[minote plugin] sync MI notes success');
 		} catch (e) {
 			if (Platform.isDesktopApp) {
 				new Notice('同步小米笔记异常，请打开控制台查看详情');
 			}
-			console.error('failed to sync MI notes', e);
+			console.error('[minote plugin] failed to sync MI notes', e);
 		} finally {
 			this.syncing = false;
 		}
