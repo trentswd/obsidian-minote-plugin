@@ -3,7 +3,7 @@
  * @author Emac
  * @date 2025-01-05
  */
-import { Notice, requestUrl, RequestUrlParam, Platform } from 'obsidian';
+import { requestUrl, type RequestUrlParam } from 'obsidian';
 import { get } from 'svelte/store';
 
 import { settingsStore } from './settings';

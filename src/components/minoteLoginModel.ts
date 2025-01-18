@@ -36,7 +36,7 @@ export default class MinoteLoginModel {
 		const loginFilter = {
 			urls: ['https://account.xiaomi.com/fe/service/account?cUserId=*', 'https://i.mi.com/status/lite/profile?ts=*']
 		};
-		session.webRequest.onCompleted(loginFilter, async (details) => {
+		session.webRequest.onCompleted(loginFilter, async (details: any) => {
 			console.log('[minote plugin] onCompleted details: ', details);
 			if (details.url.startsWith('https://account.xiaomi.com/fe/service/account')) {
 				if (details.statusCode == 200) {
@@ -61,7 +61,7 @@ export default class MinoteLoginModel {
 		const cookieFilter = {
 			urls: ['https://i.mi.com/status/lite/profile?ts=*']
 		};
-		session.webRequest.onSendHeaders(cookieFilter, (details) => {
+		session.webRequest.onSendHeaders(cookieFilter, (details: any) => {
 			console.log('[minote plugin] onSendHeaders details: ', details);
 			const cookie = details.requestHeaders['Cookie'];
 			if (cookie) {
@@ -77,10 +77,10 @@ export default class MinoteLoginModel {
 	listenOnProfileResponse(webContents: any) {
 		try {
 			webContents.debugger.attach('1.3');
-			webContents.debugger.on('message', (event, method, params) => {
+			webContents.debugger.on('message', (event: any, method: any, params: any) => {
 				if (method === 'Network.responseReceived') {
 					if (params.response.url.startsWith('https://i.mi.com/status/lite/profile')) {
-						webContents.debugger.sendCommand('Network.getResponseBody', { requestId: params.requestId }).then((response) => {
+						webContents.debugger.sendCommand('Network.getResponseBody', { requestId: params.requestId }).then((response: any) => {
 							const profile = JSON.parse(response.body);
 							settingsStore.actions.setUser(profile.data.nickname);
 							this.profileRetrieved = true;

@@ -30,7 +30,7 @@ export default class MinoteLogoutModel {
 		const filter = {
 			urls: ['https://logout.account.xiaomi.com/logout*']
 		};
-		session.webRequest.onCompleted(filter, (details) => {
+		session.webRequest.onCompleted(filter, (details: any) => {
 			if (details.statusCode == 200) {
 				console.log('[minote plugin] logout success');
 				settingsStore.actions.clearCookie();

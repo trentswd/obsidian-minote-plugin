@@ -167,13 +167,13 @@ export default class NoteSyncer {
 				);
 
 				// 规则3: 转换图片行 (☺格式)
-				content = content.replace(/☺\s+([^<]+)(<0\/><\/>)?/gm, (match, fileId) => {
+				content = content.replace(/☺\s+([^<]+)(<0\/><\/>)?/gm, (match: any, fileId: any) => {
 					return fileId in imgDict ? `![](img/${fileId}.${imgDict[fileId]})` : match;
 				});
 
 				// 规则4: 转换图片行 (<img>格式)
 				content = content.replace(
-					/<img fileid="([^"]+)" imgshow="0" imgdes="" \/>/g, (match, fileId) => {
+					/<img fileid="([^"]+)" imgshow="0" imgdes="" \/>/g, (match: any, fileId: any) => {
 						return fileId in imgDict ? `![](img/${fileId}.${imgDict[fileId]})` : match;
 					}
 				);
