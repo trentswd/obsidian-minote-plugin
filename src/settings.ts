@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS: MinotePluginSettings = {
 	cookie: '',
 	isCookieValid: false,
 	user: '',
-	noteLocation: '/',
+	noteLocation: 'minote',
 	lastTimeSynced: [],
 };
 
