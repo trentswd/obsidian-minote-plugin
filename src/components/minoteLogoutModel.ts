@@ -25,6 +25,7 @@ export default class MinoteLogoutModel {
 			this.modal.setTitle('注销小米云服务，点击头像选择【退出】');
 			this.modal.show();
 		});
+
 		const session = this.modal.webContents.session;
 		const filter = {
 			urls: ['https://logout.account.xiaomi.com/logout*']

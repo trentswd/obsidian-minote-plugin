@@ -24,7 +24,6 @@ export default class NoteSyncer {
 
 	public async sync(force = false) {
 		console.log('[minote plugin] sync MI notes', force);
-		await this.minoteApi.refreshCookie();
 
 		if (force) {
 			settingsStore.actions.clearLastTimeSynced();

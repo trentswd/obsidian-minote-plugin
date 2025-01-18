@@ -50,25 +50,4 @@ export default class MinoteApi {
 		const resp = await requestUrl(req);
 		return resp.arrayBuffer;
 	}
-
-	async refreshCookie() {
-		const req: RequestUrlParam = {
-			url: 'https://account.xiaomi.com/pass/serviceLogin',
-			method: 'GET',
-			headers: this.getHeaders()
-		};
-		const resp = await requestUrl(req);
-		const respCookie: string = resp.headers['set-cookie'] || resp.headers['Set-Cookie'];
-		console.log('[minote plugin - debug] respCookie: ', respCookie);
-		if (respCookie === undefined) {
-			new Notice('Cookie已过期，请重新登录小米云服务');
-		} else {
-			new Notice('Cookie已过期，尝试刷新Cookie成功');
-			this.updateCookie(respCookie);
-		}
-	}
-
-	private updateCookie(respCookie: string) {
-		settingsStore.actions.setCookie(respCookie);
-	}
 }
