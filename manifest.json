@@ -6,6 +6,6 @@
 	"description": "Obsidian Minote Plugin is a plugin to sync Minote(小米笔记) into your Obsidian Vault.",
 	"author": "Emac Shen",
 	"authorUrl": "https://emacoo.cn",
-	"fundingUrl": "https://github.com/emac/emac.github.io/issues/1",
+	"fundingUrl": "https://github.com/emac/obsidian-minote-plugin/issues/1",
 	"isDesktopOnly": true
 }

@@ -22,7 +22,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 安装方法
-插件市场直接搜索 `minote`，找到 `Minote Plugin`点击`install`安装，安装完成后点击`Enable`使插件启用，也可以直接在[release](https://github.com/emac/obsidian-minote-plugin/releases)页面手动下载。
+插件市场直接搜索 `minote`，找到 `Minote Plugin` 点击 `install` 安装，安装完成后点击 `Enable` 使插件启用，也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载。
 
 
 ## 设置
@@ -35,7 +35,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 ## 使用
 ⚠️ 本插件是覆盖式更新，请不要在同步的文件里修改内容。
 
-点击左侧 Ribbon上的小米笔记按钮，或者command+P(windows ctrl+P)调出Command Pattle 输入Minote 找到`同步小米笔记`即可同步。
+点击左侧 Ribbon 上的小米笔记按钮(![](/cloud-download.png))，或者 `command+P(windows ctrl+P)` 调出 Command Pattle 输入 `Minote` 找到`同步小米笔记`即可同步。
 
 
 ## 已知问题
@@ -49,7 +49,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 赞赏
-<img src="https://cloud.githubusercontent.com/assets/758420/20865022/55350f8c-ba41-11e6-8207-02657ddfd437.png" width=30% />
+<img src="/wechat-sponsors.jpg" width=30% />
 
 
 ## 免责声明
