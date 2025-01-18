@@ -11,12 +11,12 @@ import { settingsStore } from './settings';
 export default class FileManager {
 	private vault: Vault;
 	private metadataCache: MetadataCache;
-	private noteLocation: string;
 
 	constructor(vault: Vault, metadataCache: MetadataCache) {
 		this.vault = vault;
 		this.metadataCache = metadataCache;
-		this.noteLocation = get(settingsStore).noteLocation;
+		// 创建默认文件夹（如果不存在）
+		this.createFolder("");
 	}
 
 	async createFolder(folderPath: string) {
@@ -25,20 +25,20 @@ export default class FileManager {
 		}
 
 		console.log('[minote plugin] create folder: ', folderPath);
-		this.vault.createFolder(`${this.noteLocation}/${folderPath}`);
+		this.vault.createFolder(`${get(settingsStore).noteLocation}/${folderPath}`);
 	}
 
 	async exists(filePath: string) {
-		return this.vault.adapter.exists(`${this.noteLocation}/${filePath}`);
+		return this.vault.adapter.exists(`${get(settingsStore).noteLocation}/${filePath}`);
 	}
 
 	async saveFile(filePath: string, content: string) {
 		console.log('[minote plugin] save file: ', filePath);
-		this.vault.adapter.write(`${this.noteLocation}/${filePath}`, content);
+		this.vault.adapter.write(`${get(settingsStore).noteLocation}/${filePath}`, content);
 	}
 
 	async saveBinaryFile(filePath: string, binary: ArrayBuffer) {
 		console.log('[minote plugin] save binary file: ', filePath);
-		this.vault.adapter.writeBinary(`${this.noteLocation}/${filePath}`, binary);
+		this.vault.adapter.writeBinary(`${get(settingsStore).noteLocation}/${filePath}`, binary);
 	}
 }

@@ -29,12 +29,12 @@ const createSettingsStore = () => {
 	let _plugin!: MinotePlugin;
 
 	const initialize = async (plugin: MinotePlugin): Promise<void> => {
+		_plugin = plugin;
+
 		const data = Object.assign({}, DEFAULT_SETTINGS, await plugin.loadData());
 		const settings: MinotePluginSettings = { ...data };
-
 		console.log('[minote plugin] init cookie: ', settings.cookie);
 		store.set(settings);
-		_plugin = plugin;
 	};
 
 	store.subscribe(async (settings) => {
