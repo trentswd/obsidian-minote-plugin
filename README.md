@@ -36,7 +36,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 已知问题
-- 长期不使用本插件Cookie可能会失效，需要重新登录。
+- 长期不使用本插件Cookie可能会失效，需要手动刷新Cookie。
 - 偶尔可能会有网络连接问题，重新点击同步即可，已同步的笔记不会再次更新。
 
 
@@ -50,7 +50,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 免责声明
-本程序没有爬取任何书籍内容，只提供登录用户的图书以及笔记信息，没有侵犯书籍作者版权和微信读书官方利益。
+所有笔记内容均来自小米云服务，用户登录即授权本程序同步用户的笔记内容到本地。
 
 
 ## 感谢
