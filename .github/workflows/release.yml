@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: obsidian-minote-plugin
+  PLUGIN_NAME: minote-sync
 
 jobs:
   build:

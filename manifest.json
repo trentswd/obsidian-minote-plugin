@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-minote-plugin",
-	"name": "Minote",
-	"version": "0.1.1",
+	"id": "minote-sync",
+	"name": "Minote Sync",
+	"version": "0.1.2",
 	"minAppVersion": "0.15.0",
-	"description": "Obsidian Minote Plugin is a plugin to sync Minote(小米笔记) into your Obsidian Vault.",
+	"description": "Sync Minote(小米笔记) into your vault.",
 	"author": "Emac Shen",
 	"authorUrl": "https://emacoo.cn",
 	"fundingUrl": "https://github.com/emac/obsidian-minote-plugin/issues/1",
