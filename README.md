@@ -1,7 +1,5 @@
 # Obsidian Minote Plugin
 
-[![](https://github.com/emac/obsidian-minote-plugin/actions/workflows/CI.yml/badge.svg)](https://github.com/emac/obsidian-minote-plugin/actions/workflows/CI.yml)
-[![Release Obsidian plugin](https://github.com/emac/obsidian-minote-plugin/actions/workflows/release.yml/badge.svg)](https://github.com/emac/obsidian-minote-plugin/actions/workflows/release.yml)
 [![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/main/LICENSE)
 [![Github all releases](https://img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases)
 [![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/)](https://github.com/emac/obsidian-minote-plugin/releases)
