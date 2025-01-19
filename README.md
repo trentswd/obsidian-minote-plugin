@@ -29,6 +29,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 3. 注销登录可以清除插件的 Cookie 信息，注销方法和网页版小米云服务一样，右上角点击头像，点击退出
 4. 设置笔记保存位置，默认保存到 `/minote` 文件夹，可以修改为其他位置
 
+![](/minote-sync-settings.jpg)
 
 ## 使用
 ⚠️ 本插件是覆盖式更新，请不要在同步的文件里修改内容。
