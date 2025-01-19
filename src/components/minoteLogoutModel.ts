@@ -32,7 +32,6 @@ export default class MinoteLogoutModel {
 		};
 		session.webRequest.onCompleted(filter, (details: any) => {
 			if (details.statusCode == 200) {
-				console.log('[minote plugin] logout success');
 				settingsStore.actions.clearCookie();
 				this.settingTab.display();
 				this.modal.close();

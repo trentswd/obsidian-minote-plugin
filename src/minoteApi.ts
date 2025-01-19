@@ -21,7 +21,6 @@ export default class MinoteApi {
 	}
 
 	async fetchPage(syncTag = '') {
-		console.log('[minote plugin] fetch page: ', syncTag);
 		const req: RequestUrlParam = {
 			url: this.baseUrl + `/note/full/page?ts=${Date.now()}&syncTag=${syncTag}&limit=200`,
 			method: 'GET',

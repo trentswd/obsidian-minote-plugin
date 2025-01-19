@@ -37,7 +37,6 @@ export default class MinoteRefreshCookieModel {
 			urls: ['https://i.mi.com/status/lite/profile?ts=*']
 		};
 		session.webRequest.onSendHeaders(cookieFilter, (details: any) => {
-			console.log('[minote plugin] onSendHeaders details: ', details);
 			const cookie = details.requestHeaders['Cookie'];
 			if (cookie) {
 				settingsStore.actions.setCookie(cookie);

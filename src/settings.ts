@@ -33,7 +33,6 @@ const createSettingsStore = () => {
 
 		const data = Object.assign({}, DEFAULT_SETTINGS, await plugin.loadData());
 		const settings: MinotePluginSettings = { ...data };
-		console.log('[minote plugin] init cookie: ', settings.cookie);
 		store.set(settings);
 	};
 
@@ -45,7 +44,6 @@ const createSettingsStore = () => {
 	});
 
 	const clearCookie = () => {
-		console.log('[minote plugin] clearing cookie...');
 		store.update((state) => {
 			state.cookie = '';
 			state.isCookieValid = false;
@@ -55,7 +53,6 @@ const createSettingsStore = () => {
 	};
 
 	const setCookie = (cookie: string) => {
-		console.log('[minote plugin] setting cookie: ', cookie);
 		store.update((state) => {
 			state.cookie = cookie;
 			state.isCookieValid = true;
@@ -64,7 +61,6 @@ const createSettingsStore = () => {
 	};
 
 	const setUser = (user: string) => {
-		console.log('[minote plugin] setting user name: ', user);
 		store.update((state) => {
 			state.user = user;
 			return state;

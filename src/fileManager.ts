@@ -24,7 +24,6 @@ export default class FileManager {
 			return;
 		}
 
-		console.log('[minote plugin] create folder: ', folderPath);
 		this.vault.createFolder(`${get(settingsStore).noteLocation}/${folderPath}`);
 	}
 
@@ -33,12 +32,10 @@ export default class FileManager {
 	}
 
 	async saveFile(filePath: string, content: string) {
-		console.log('[minote plugin] save file: ', filePath);
 		this.vault.adapter.write(`${get(settingsStore).noteLocation}/${filePath}`, content);
 	}
 
 	async saveBinaryFile(filePath: string, binary: ArrayBuffer) {
-		console.log('[minote plugin] save binary file: ', filePath);
 		this.vault.adapter.writeBinary(`${get(settingsStore).noteLocation}/${filePath}`, binary);
 	}
 }

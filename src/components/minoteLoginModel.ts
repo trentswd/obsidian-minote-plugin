@@ -37,10 +37,8 @@ export default class MinoteLoginModel {
 			urls: ['https://account.xiaomi.com/fe/service/account?cUserId=*', 'https://i.mi.com/status/lite/profile?ts=*']
 		};
 		session.webRequest.onCompleted(loginFilter, async (details: any) => {
-			console.log('[minote plugin] onCompleted details: ', details);
 			if (details.url.startsWith('https://account.xiaomi.com/fe/service/account')) {
 				if (details.statusCode == 200) {
-					console.log('[minote plugin] login success');
 					this.modal.loadURL('https://i.mi.com/note/h5')
 				}
 			}
@@ -62,7 +60,6 @@ export default class MinoteLoginModel {
 			urls: ['https://i.mi.com/status/lite/profile?ts=*']
 		};
 		session.webRequest.onSendHeaders(cookieFilter, (details: any) => {
-			console.log('[minote plugin] onSendHeaders details: ', details);
 			const cookie = details.requestHeaders['Cookie'];
 			if (cookie) {
 				settingsStore.actions.setCookie(cookie);
@@ -90,7 +87,7 @@ export default class MinoteLoginModel {
 			});
 			webContents.debugger.sendCommand('Network.enable');
 		} catch (err) {
-			console.log('[minote plugin] debugger attach failed: ', err);
+			console.error('[minote plugin] debugger attach failed: ', err);
 		}
 	}
 

@@ -16,7 +16,6 @@ export default class MinotePlugin extends Plugin {
 	private syncing = false;
 
 	async onload() {
-		console.log('[minote plugin] loading...');
 		await settingsStore.initialize(this);
 
 		const fileManager = new FileManager(this.app.vault, this.app.metadataCache);
@@ -66,7 +65,7 @@ export default class MinotePlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'sync-minote-command',
+			id: 'sync-minote',
 			name: '同步小米笔记',
 			callback: () => {
 				this.startSync();
@@ -74,7 +73,7 @@ export default class MinotePlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'force-sync-minote-command',
+			id: 'force-sync-minote',
 			name: '强制同步小米笔记',
 			callback: () => {
 				this.startSync(true);
@@ -92,7 +91,6 @@ export default class MinotePlugin extends Plugin {
 		this.syncing = true;
 		try {
 			await this.noteSyncer.sync(force);
-			console.log('[minote plugin] sync MI notes success');
 		} catch (e) {
 			if (Platform.isDesktopApp) {
 				new Notice('同步小米笔记异常，请打开控制台查看详情');
@@ -104,6 +102,5 @@ export default class MinotePlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('[minote plugin] unloading...');
 	}
 }

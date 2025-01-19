@@ -23,8 +23,6 @@ export default class NoteSyncer {
 	}
 
 	public async sync(force = false) {
-		console.log('[minote plugin] sync MI notes', force);
-
 		if (force) {
 			settingsStore.actions.clearLastTimeSynced();
 		}
@@ -98,7 +96,6 @@ export default class NoteSyncer {
 
 	private async syncNotes() {
 		let syncedCount = 0;
-		const startTime = Date.now();
 
 		// 加载上次同步信息
 		let lastNoteDict: Record<string, number> = get(settingsStore).lastTimeSynced.reduce((acc: Record<string, number>, note: SyncInfo) => {
@@ -195,9 +192,6 @@ export default class NoteSyncer {
 
 		// 更新上次同步信息
 		settingsStore.actions.setLastTimeSynced(thisTimeSynced);
-
-		const elapsed = (Date.now() - startTime) / 1000;
-		console.log(`[minote plugin] sync MI notes done: ${syncedCount} notes, ${elapsed.toFixed(2)} seconds`);
 	}
 
 	private async downloadImage(fileId: string, imgPath: string) {
