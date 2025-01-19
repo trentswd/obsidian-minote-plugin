@@ -2,9 +2,9 @@
 
 [![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/main/LICENSE)
 [![Github all releases](https://img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases)
-[![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/)](https://github.com/emac/obsidian-minote-plugin/releases)
+[![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/all)](https://github.com/emac/obsidian-minote-plugin/releases)
 
-Obsidian 小米笔记同步插件是一个社区插件，用来将小米笔记转换为 Markdown 格式保存到 Obsidian 指定的文件夹中。首次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
+Obsidian 小米笔记同步插件是一个社区插件，用来将[小米笔记](https://i.mi.com/note/h5#/)转换为 Markdown 格式保存到 Obsidian 指定的文件夹中。首次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
 
 ## 更新历史
 https://github.com/emac/obsidian-minote-plugin/releases
@@ -20,11 +20,11 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 安装方法
-插件市场直接搜索 `minote`，找到 `Minote Sync` 点击 `install` 安装，安装完成后点击 `Enable` 使插件启用，也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载。
+打开 Obsidian 的设置页面，点选左侧`第三方插件`，点击`关闭安全模式`按钮以启用第三方插件，点击社区插件市场的`浏览`按钮，搜索 `minote`，找到 `Minote Sync` 插件，然后安装和启用。也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载最新版本。
 
 
 ## 设置
-1. 打开 Obsidian 点击 `设置` 进入设置界面，找到 `Minote Sync` 进入到插件设置页面
+1. 打开 Obsidian 的设置页面，找到 `Minote Sync` 进入到插件设置页面
 2. 点击右侧 `登录` 按钮，在弹出的登录页面扫码登录，登录完成后，会显示个人昵称
 3. 注销登录可以清除插件的 Cookie 信息，注销方法和网页版小米云服务一样，右上角点击头像，点击退出
 4. 设置笔记保存位置，默认保存到 `/minote` 文件夹，可以修改为其他位置
@@ -63,7 +63,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 # Obsidian Plugin: Minote Sync Plugin
 
-This community plugin syncs your Xiaomi notes to Obsidian by converting them to Markdown format and saving them in a specified folder. The initial sync might be slow if you have many notes, but subsequent syncs will only update changed notes incrementally.
+This community plugin syncs your [Xiaomi notes](https://i.mi.com/note/h5#/) to Obsidian by converting them to Markdown format and saving them in a specified folder. The initial sync might be slow if you have many notes, but subsequent syncs will only update changed notes incrementally.
 
 ## Features
 - Organizes notes in folders
@@ -74,12 +74,12 @@ This community plugin syncs your Xiaomi notes to Obsidian by converting them to 
 - Supports force sync mode for full overwrite updates
 
 ## Installation
-Search for `minote` in the plugin marketplace, find `Minote Sync` and click `install`. Enable the plugin after installation. You can also manually download from the [release](https://github.com/emac/obsidian-minote-plugin/releases) page.
+Open Obsidian settings, go to `Community plugins` on the left, click the `Turn off safe mode` button to enable third-party plugins. Click the `Browse` button in the Community plugins marketplace, search for `minote`, find `Minote Sync` plugin, then install and enable it. You can also manually download the latest version from the [release](https://github.com/emac/obsidian-minote-plugin/releases) page.
 
 ## Settings
 1. Open Obsidian settings, find `Minote Sync` in the plugin settings
 2. Click the `Login` button and scan the QR code in the popup login page
-3. To logout, clear the plugin's Cookie information following the same process as the web version
+3. To logout and clear the plugin's Cookie information, follow the same process as the web version of Xiaomi Cloud Service - click the avatar in the top right corner and select logout
 4. Set note storage location (default is `/minote` folder)
 
 ## Usage
