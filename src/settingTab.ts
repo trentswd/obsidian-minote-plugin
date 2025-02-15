@@ -25,7 +25,6 @@ export class MinoteSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: '设置小米笔记插件' });
 		const isCookieValid = get(settingsStore).isCookieValid;
 		if (Platform.isDesktopApp) {
 			if (isCookieValid) {

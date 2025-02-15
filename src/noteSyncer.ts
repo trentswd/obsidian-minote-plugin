@@ -29,7 +29,7 @@ export default class NoteSyncer {
 
 		await this.fetchNotesAndFolders();
 		await this.createFolders();
-		await this.syncNotes();
+		return await this.syncNotes();
 	}
 
 	private async fetchNotesAndFolders() {
@@ -192,6 +192,7 @@ export default class NoteSyncer {
 
 		// 更新上次同步信息
 		settingsStore.actions.setLastTimeSynced(thisTimeSynced);
+		return syncedCount
 	}
 
 	private async downloadImage(fileId: string, imgPath: string) {

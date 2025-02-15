@@ -65,7 +65,7 @@ export default class MinotePlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'sync-minote',
+			id: 'sync',
 			name: '同步小米笔记',
 			callback: () => {
 				this.startSync();
@@ -73,7 +73,7 @@ export default class MinotePlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'force-sync-minote',
+			id: 'force-sync',
 			name: '强制同步小米笔记',
 			callback: () => {
 				this.startSync(true);
@@ -90,11 +90,11 @@ export default class MinotePlugin extends Plugin {
 		}
 		this.syncing = true;
 		try {
-			await this.noteSyncer.sync(force);
+			new Notice('开始同步小米笔记...');
+			const syncedCount = await this.noteSyncer.sync(force);
+			new Notice(`已同步 ${syncedCount} 篇小米笔记`);
 		} catch (e) {
-			if (Platform.isDesktopApp) {
-				new Notice('同步小米笔记异常，请打开控制台查看详情');
-			}
+			new Notice('同步小米笔记异常，请打开控制台查看详情');
 			console.error('[minote plugin] failed to sync MI notes', e);
 		} finally {
 			this.syncing = false;

@@ -3,7 +3,7 @@
  * @author Emac
  * @date 2025-01-05
  */
-import { Notice } from 'obsidian';
+const { remote } = require('electron');
 
 import { settingsStore } from '../settings';
 import { MinoteSettingTab } from '../settingTab';
@@ -16,7 +16,6 @@ export default class MinoteLoginModel {
 	constructor(settingTab: MinoteSettingTab) {
 		this.settingTab = settingTab;
 
-		const { remote } = require('electron');
 		const { BrowserWindow: RemoteBrowserWindow } = remote;
 		this.modal = new RemoteBrowserWindow({
 			parent: remote.getCurrentWindow(),
