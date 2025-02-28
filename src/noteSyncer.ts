@@ -119,7 +119,7 @@ export default class NoteSyncer {
 
 				const folderName = this.folderDict[note.folderId];
 				const folderPath = folderName;
-				const notePath = path.join(folderPath, `${note.title}.md`);
+				const notePath = path.join(folderPath, `${note.id}.md`);
 
 				// 获取笔记内容
 				const noteDetails = await this.minoteApi.fetchNoteDetails(note.id);
