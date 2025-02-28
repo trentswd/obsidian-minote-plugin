@@ -5,6 +5,7 @@
  */
 import { Vault, MetadataCache, TFile, TFolder, Notice, TAbstractFile } from 'obsidian';
 import { get } from 'svelte/store';
+import path from 'path';
 
 import { settingsStore } from './settings';
 
@@ -24,18 +25,18 @@ export default class FileManager {
 			return;
 		}
 
-		this.vault.createFolder(`${get(settingsStore).noteLocation}/${folderPath}`);
+		this.vault.createFolder(path.join(get(settingsStore).noteLocation, folderPath));
 	}
 
 	async exists(filePath: string) {
-		return this.vault.adapter.exists(`${get(settingsStore).noteLocation}/${filePath}`);
+		return this.vault.adapter.exists(path.join(get(settingsStore).noteLocation, filePath));
 	}
 
 	async saveFile(filePath: string, content: string) {
-		this.vault.adapter.write(`${get(settingsStore).noteLocation}/${filePath}`, content);
+		this.vault.adapter.write(path.join(get(settingsStore).noteLocation, filePath), content);
 	}
 
 	async saveBinaryFile(filePath: string, binary: ArrayBuffer) {
-		this.vault.adapter.writeBinary(`${get(settingsStore).noteLocation}/${filePath}`, binary);
+		this.vault.adapter.writeBinary(path.join(get(settingsStore).noteLocation, filePath), binary);
 	}
 }
