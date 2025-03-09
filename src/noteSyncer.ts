@@ -8,7 +8,7 @@ import { get } from 'svelte/store';
 import { settingsStore } from './settings';
 import FileManager from './fileManager';
 import MinoteApi from './minoteApi';
-import * as path from 'path';
+import path from 'path';
 
 export default class NoteSyncer {
 	private fileManager: FileManager;
@@ -16,6 +16,7 @@ export default class NoteSyncer {
 	private notes: Note[] = [];
 	private folders: Folder[] = [];
 	private folderDict: Record<string, string> = {};
+	private thisTimeSynced: SyncInfo[] = [];
 
 	constructor(fileManager: FileManager, minoteApi: MinoteApi) {
 		this.fileManager = fileManager;
@@ -23,13 +24,27 @@ export default class NoteSyncer {
 	}
 
 	public async sync(force = false) {
+		this.clear();
+
 		if (force) {
 			settingsStore.actions.clearLastTimeSynced();
 		}
 
 		await this.fetchNotesAndFolders();
 		await this.createFolders();
-		return await this.syncNotes();
+		const count = await this.syncNotes();
+
+		// 更新上次同步信息
+		settingsStore.actions.setLastTimeSynced(this.thisTimeSynced);
+
+		return count;
+	}
+
+	private clear() {
+		this.notes = [];
+		this.folders = [];
+		this.folderDict = {};
+		this.thisTimeSynced = [];
 	}
 
 	private async fetchNotesAndFolders() {
@@ -47,8 +62,8 @@ export default class NoteSyncer {
 					if (!title) {
 						title = entry.snippet.split('\n')[0] + `_${entry.id}`;
 					}
-					// 将标题中的斜杠替换为竖线
-					title = title.trim().replace(/\//g, '|');
+					// 将标题中的正反斜杠替换为下划线
+					title = title.trim().replace(/[\\\/]/g, '_');
 
 					const note: Note = {
 						id: entry.id,
@@ -86,11 +101,41 @@ export default class NoteSyncer {
 		this.folders.push({ id: '0', name: '未分类' });
 
 		for (const folder of this.folders) {
+			// 更新文件夹字典
+			this.folderDict[folder.id] = folder.name;
+
+			// 加载上次同步信息
+			let lastSyncedFolders: Record<string, SyncInfo> = get(settingsStore).lastTimeSynced
+				.filter(note => note.type === 'folder')
+				.reduce((acc: Record<string, SyncInfo>, note: SyncInfo) => {
+					acc[note.id] = note;
+					return acc;
+				}, {});
+
+			// 如果上次曾同步过
+			if (folder.id in lastSyncedFolders) {
+				if (folder.name !== lastSyncedFolders[folder.id].name) {
+					// 重命名文件夹
+					await this.fileManager.renameFolder(lastSyncedFolders[folder.id].name, folder.name);
+					lastSyncedFolders[folder.id].name = folder.name;					
+				}
+
+				// 添加到已处理文件夹列表
+				lastSyncedFolders[folder.id].syncTime = Date.now();
+				this.thisTimeSynced.push(lastSyncedFolders[folder.id]);
+				continue;
+			}
+
 			// 创建文件夹目录
 			await this.fileManager.createFolder(folder.name);
 
-			// 更新文件夹字典
-			this.folderDict[folder.id] = folder.name;
+			// 添加到已处理文件夹列表
+			this.thisTimeSynced.push({
+				id: folder.id,
+				type: 'folder',
+				name: folder.name,
+				syncTime: Date.now()
+			});
 		}
 	}
 
@@ -98,28 +143,30 @@ export default class NoteSyncer {
 		let syncedCount = 0;
 
 		// 加载上次同步信息
-		let lastNoteDict: Record<string, number> = get(settingsStore).lastTimeSynced.reduce((acc: Record<string, number>, note: SyncInfo) => {
-			acc[note.id] = note.modifyDate;
-			return acc;
-		}, {});
+		let lastSyncedNotes: Record<string, SyncInfo> = get(settingsStore).lastTimeSynced
+			.filter(note => note.type === 'note')
+			.reduce((acc: Record<string, SyncInfo>, note: SyncInfo) => {
+				acc[note.id] = note;
+				return acc;
+			}, {});
 
 		// 记录此次同步信息
-		const thisTimeSynced: SyncInfo[] = [];
 		for (const note of this.notes) {
 			try {
 				// 如果笔记未修改则跳过
-				if (note.id in lastNoteDict && note.modifyDate <= lastNoteDict[note.id]) {
+				if (note.id in lastSyncedNotes && note.modifyDate <= lastSyncedNotes[note.id].syncTime) {
 					// 添加到已处理笔记列表
-					thisTimeSynced.push({
-						id: note.id,
-						modifyDate: note.modifyDate
-					});
+					this.thisTimeSynced.push(lastSyncedNotes[note.id]);
 					continue;
 				}
 
 				const folderName = this.folderDict[note.folderId];
 				const folderPath = folderName;
-				const notePath = path.join(folderPath, `${note.title}.md`);
+
+				// 如果笔记修改过名字则先删除旧笔记
+				if (note.id in lastSyncedNotes && note.title !== lastSyncedNotes[note.id].name) {
+					await this.fileManager.deleteFile(path.join(folderPath, `${lastSyncedNotes[note.id].name}.md`));
+				}
 
 				// 获取笔记内容
 				const noteDetails = await this.minoteApi.fetchNoteDetails(note.id);
@@ -176,13 +223,16 @@ export default class NoteSyncer {
 				);
 
 				// 保存转换后的内容
+				const notePath = path.join(folderPath, `${note.title}.md`);
 				await this.fileManager.saveFile(notePath, content);
 
 				syncedCount++;
 				// 添加到已处理笔记列表
-				thisTimeSynced.push({
+				this.thisTimeSynced.push({
 					id: note.id,
-					modifyDate: note.modifyDate
+					type: 'note',
+					name: note.title,
+					syncTime: note.modifyDate
 				});
 			} catch (err) {
 				console.error('[minote plugin] sync MI note error: ', note, err);
@@ -190,8 +240,6 @@ export default class NoteSyncer {
 			}
 		}
 
-		// 更新上次同步信息
-		settingsStore.actions.setLastTimeSynced(thisTimeSynced);
 		return syncedCount
 	}
 

@@ -94,7 +94,7 @@ export default class MinotePlugin extends Plugin {
 			const syncedCount = await this.noteSyncer.sync(force);
 			new Notice(`已同步 ${syncedCount} 篇小米笔记`);
 		} catch (e) {
-			new Notice('同步小米笔记异常，请打开控制台查看详情');
+			new Notice('同步小米笔记异常，请打开设置页面检查登录状态或者刷新Cookie');
 			console.error('[minote plugin] failed to sync MI notes', e);
 		} finally {
 			this.syncing = false;

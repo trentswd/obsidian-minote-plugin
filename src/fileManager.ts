@@ -20,6 +20,10 @@ export default class FileManager {
 		this.createFolder("");
 	}
 
+	async exists(filePath: string) {
+		return this.vault.adapter.exists(normalizePath(path.join(get(settingsStore).noteLocation, filePath)));
+	}
+
 	async createFolder(folderPath: string) {
 		if (await this.exists(folderPath)) {
 			return;
@@ -28,8 +32,20 @@ export default class FileManager {
 		this.vault.createFolder(normalizePath(path.join(get(settingsStore).noteLocation, folderPath)));
 	}
 
-	async exists(filePath: string) {
-		return this.vault.adapter.exists(normalizePath(path.join(get(settingsStore).noteLocation, filePath)));
+	async renameFolder(oldPath: string, newPath: string) {
+		if (await !this.exists(oldPath) || await this.exists(newPath)) {
+			return;
+		}
+
+		this.vault.adapter.rename(normalizePath(path.join(get(settingsStore).noteLocation, oldPath)), normalizePath(path.join(get(settingsStore).noteLocation, newPath)));
+	}
+
+	async deleteFile(filePath: string) {
+		if (!await this.exists(filePath)) {
+			return;
+		}
+
+		this.vault.adapter.remove(normalizePath(path.join(get(settingsStore).noteLocation, filePath)));
 	}
 
 	async saveFile(filePath: string, content: string) {

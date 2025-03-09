@@ -22,5 +22,7 @@ interface ImageInfo {
 
 interface SyncInfo {
 	id: string;
-	modifyDate: number;
+	type: string;
+	name: string;
+	syncTime: number;
 }
