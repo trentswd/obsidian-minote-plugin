@@ -20,7 +20,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 
 ## 安装方法
-打开 Obsidian 的设置页面，点选左侧`第三方插件`，点击`关闭安全模式`按钮以启用第三方插件，点击社区插件市场的`浏览`按钮，搜索 `minote`，找到 `Minote Sync` 插件，然后安装和启用。也可以直接在 [release](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载最新版本。
+打开 Obsidian 的设置页面，点选左侧`第三方插件`，点击`关闭安全模式`按钮以启用第三方插件，点击社区插件市场的`浏览`按钮，搜索 `minote`，找到 `Minote Sync` 插件，然后安装和启用。也可以直接在 [releases](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载最新版本。
 
 
 ## 设置
@@ -44,6 +44,7 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 ## TODO
 - [ ] 支持思维笔记
+- [ ] 支持待办
 - [ ] 支持移动端
 
 

@@ -62,8 +62,10 @@ export default class NoteSyncer {
 					if (!title) {
 						title = entry.snippet.split('\n')[0] + `_${entry.id}`;
 					}
-					// 将标题中的正反斜杠替换为下划线
-					title = title.trim().replace(/[\\\/]/g, '_');
+					// 去除标题中的HTML标签
+					title = title.replace(/<[^>]+>/g, '');
+					// 去除标题中的非法字符 \/:*?"<>|
+					title = title.replace(/[\\\/:*?"<>|]/g, '');
 
 					const note: Note = {
 						id: entry.id,
