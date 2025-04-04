@@ -9,7 +9,6 @@ Obsidian 小米笔记同步插件是一个社区插件，用来将[小米笔记]
 ## 更新历史
 https://github.com/emac/obsidian-minote-plugin/releases
 
-
 ## 功能
 - 按文件夹存放笔记
 - 自动下载笔记中的图片，并将引用方式替换成 Markdown 格式
@@ -17,11 +16,10 @@ https://github.com/emac/obsidian-minote-plugin/releases
 - 去除多余的 `<text>` 标签
 - 兼容旧版本无标题笔记（根据首行内容和笔记 ID 自动生成标题）
 - 支持强制同步模式，即全量覆盖更新
-
+- 支持非中国区的小米云服务
 
 ## 安装方法
 打开 Obsidian 的设置页面，点选左侧`第三方插件`，点击`关闭安全模式`按钮以启用第三方插件，点击社区插件市场的`浏览`按钮，搜索 `minote`，找到 `Minote Sync` 插件，然后安装和启用。也可以直接在 [releases](https://github.com/emac/obsidian-minote-plugin/releases) 页面手动下载最新版本。
-
 
 ## 设置
 1. 打开 Obsidian 的设置页面，找到 `Minote Sync` 进入到插件设置页面
@@ -36,25 +34,20 @@ https://github.com/emac/obsidian-minote-plugin/releases
 
 点击左侧 Ribbon 上的小米笔记按钮(![](/cloud-download.png))，或者 `command+P(windows ctrl+P)` 调出 Command Pattle 输入 `Minote` 找到`同步小米笔记`即可同步。
 
-
 ## 已知问题
 - 一段时间不使用本插件，Cookie 可能会失效，需要到插件设置页面手动刷新Cookie。
 - 偶尔可能会有网络连接问题，重新点击同步即可，已同步的笔记不会再次更新。
-
 
 ## TODO
 - [ ] 支持思维笔记
 - [ ] 支持待办
 - [ ] 支持移动端
 
-
 ## 赞赏
 <img src="/wechat-sponsors.jpg" width=30% />
 
-
 ## 免责声明
 所有笔记内容均来自小米云服务，用户登录即授权本插件同步用户的笔记内容到本地。
-
 
 ## 感谢
 - [Weread Plugin](https://github.com/zhaohongxuan/obsidian-weread-plugin)
@@ -74,6 +67,7 @@ This community plugin syncs your [Xiaomi notes](https://i.mi.com/note/h5#/) to O
 - Removes redundant `<text>` tags
 - Compatible with old version untitled notes (auto-generates titles based on first line and note ID)
 - Supports force sync mode for full overwrite updates
+- Supports Xiaomi Cloud Services in non-Chinese regions
 
 ## Installation
 Open Obsidian settings, go to `Community plugins` on the left, click the `Turn off safe mode` button to enable third-party plugins. Click the `Browse` button in the Community plugins marketplace, search for `minote`, find `Minote Sync` plugin, then install and enable it. You can also manually download the latest version from the [release](https://github.com/emac/obsidian-minote-plugin/releases) page.
