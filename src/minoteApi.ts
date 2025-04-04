@@ -9,7 +9,10 @@ import { get } from 'svelte/store';
 import { settingsStore } from './settings';
 
 export default class MinoteApi {
-	readonly baseUrl: string = 'https://i.mi.com';
+
+	private getBaseUrl() {
+		return `https://${get(settingsStore).host}`;
+	}
 
 	private getHeaders() {
 		return {
@@ -22,7 +25,7 @@ export default class MinoteApi {
 
 	async fetchPage(syncTag = '') {
 		const req: RequestUrlParam = {
-			url: this.baseUrl + `/note/full/page?ts=${Date.now()}&syncTag=${syncTag}&limit=200`,
+			url: this.getBaseUrl() + `/note/full/page?ts=${Date.now()}&syncTag=${syncTag}&limit=200`,
 			method: 'GET',
 			headers: this.getHeaders()
 		};
@@ -32,7 +35,7 @@ export default class MinoteApi {
 
 	async fetchNoteDetails(noteId: string) {
 		const req: RequestUrlParam = {
-			url: this.baseUrl + `/note/note/${noteId}/?ts=${Date.now()}`,
+			url: this.getBaseUrl() + `/note/note/${noteId}/?ts=${Date.now()}`,
 			method: 'GET',
 			headers: this.getHeaders()
 		};
@@ -42,7 +45,7 @@ export default class MinoteApi {
 
 	async fetchImage(fileId: string) {
 		const req: RequestUrlParam = {
-			url: this.baseUrl + `/file/full?type=note_img&fileid=${fileId}`,
+			url: this.getBaseUrl() + `/file/full?type=note_img&fileid=${fileId}`,
 			method: 'GET',
 			headers: this.getHeaders()
 		};

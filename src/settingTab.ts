@@ -103,10 +103,10 @@ export class MinoteSettingTab extends PluginSettingTab {
 				const folders = pickBy(files, (val: any) => {
 					return val.type === 'folder';
 				});
-
 				Object.keys(folders).forEach((val) => {
 					dropdown.addOption(val, val);
 				});
+
 				return dropdown
 					.setValue(get(settingsStore).noteLocation)
 					.onChange(async (value) => {
@@ -121,6 +121,21 @@ export class MinoteSettingTab extends PluginSettingTab {
 		advancedSettings.createEl("summary", {
 		  text: ("高级设置")
 		});
+
+		new Setting(advancedSettings)
+			.setName('小米云服务域名')
+			.addDropdown((dropdown) => {
+				const hosts = ['i.mi.com', 'eu.i.mi.com', 'us.i.mi.com', 'in.i.mi.com'];
+				hosts.forEach((val) => {
+					dropdown.addOption(val, val);
+				});
+
+				return dropdown
+					.setValue(get(settingsStore).host)
+					.onChange(async (value) => {
+						settingsStore.actions.setHost(value);
+					});
+			});
 
 		new Setting(advancedSettings)
 			.setName('本地调试')

@@ -4,6 +4,7 @@
  * @date 2025-01-05
  */
 const { remote } = require('electron');
+import { get } from 'svelte/store';
 
 import { settingsStore } from '../settings';
 import { MinoteSettingTab } from '../settingTab';
@@ -33,15 +34,15 @@ export default class MinoteLoginModel {
 		const session = webContents.session;
 
 		const loginFilter = {
-			urls: ['https://account.xiaomi.com/fe/service/account?cUserId=*', 'https://i.mi.com/status/lite/profile?ts=*']
+			urls: ['https://account.xiaomi.com/fe/service/account?cUserId=*', `https://${get(settingsStore).host}/status/lite/profile?ts=*`]
 		};
 		session.webRequest.onCompleted(loginFilter, async (details: any) => {
 			if (details.url.startsWith('https://account.xiaomi.com/fe/service/account')) {
 				if (details.statusCode == 200) {
-					this.modal.loadURL('https://i.mi.com/note/h5')
+					this.modal.loadURL(`https://${get(settingsStore).host}/note/h5`)
 				}
 			}
-			if (details.url.startsWith('https://i.mi.com/status/lite/profile')) {
+			if (details.url.startsWith(`https://${get(settingsStore).host}/status/lite/profile`)) {
 				if (details.statusCode == 200) {
 					const startTime = Date.now();
 					while (!this.profileRetrieved && Date.now() - startTime < 3000) {
@@ -56,7 +57,7 @@ export default class MinoteLoginModel {
 		});
 
 		const cookieFilter = {
-			urls: ['https://i.mi.com/status/lite/profile?ts=*']
+			urls: [`https://${get(settingsStore).host}/status/lite/profile?ts=*`]
 		};
 		session.webRequest.onSendHeaders(cookieFilter, (details: any) => {
 			const cookie = details.requestHeaders['Cookie'];
@@ -75,7 +76,7 @@ export default class MinoteLoginModel {
 			webContents.debugger.attach('1.3');
 			webContents.debugger.on('message', (event: any, method: any, params: any) => {
 				if (method === 'Network.responseReceived') {
-					if (params.response.url.startsWith('https://i.mi.com/status/lite/profile')) {
+					if (params.response.url.startsWith(`https://${get(settingsStore).host}/status/lite/profile`)) {
 						webContents.debugger.sendCommand('Network.getResponseBody', { requestId: params.requestId }).then((response: any) => {
 							const profile = JSON.parse(response.body);
 							settingsStore.actions.setUser(profile.data.nickname);

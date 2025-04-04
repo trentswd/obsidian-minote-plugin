@@ -4,6 +4,7 @@
  * @date 202-01-05
  */
 const { remote } = require('electron');
+import { get } from 'svelte/store';
 
 import { settingsStore } from '../settings';
 import { MinoteSettingTab } from '../settingTab';
@@ -41,7 +42,7 @@ export default class MinoteLogoutModel {
 	}
 
 	async doLogout() {
-		await this.modal.loadURL('https://i.mi.com');
+		await this.modal.loadURL(`https://${get(settingsStore).host}`);
 	}
 
 	onClose() {

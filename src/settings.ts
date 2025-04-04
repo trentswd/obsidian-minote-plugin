@@ -8,18 +8,20 @@ import { writable } from 'svelte/store';
 import MinotePlugin from 'main';
 
 interface MinotePluginSettings {
+	noteLocation: string;
+	host: string;
 	cookie: string;
 	isCookieValid: boolean;
 	user: string;
-	noteLocation: string;
 	lastTimeSynced: SyncInfo[];
 };
 
 const DEFAULT_SETTINGS: MinotePluginSettings = {
+	noteLocation: 'minote',
+	host: "i.mi.com",
 	cookie: '',
 	isCookieValid: false,
 	user: '',
-	noteLocation: 'minote',
 	lastTimeSynced: [],
 };
 
@@ -42,6 +44,20 @@ const createSettingsStore = () => {
 			await _plugin.saveData(data);
 		}
 	});
+
+	const setNoteLocationFolder = (value: string) => {
+		store.update((state) => {
+			state.noteLocation = value;
+			return state;
+		});
+	};
+
+	const setHost = (value: string) => {
+		store.update((state) => {
+			state.host = value;
+			return state;
+		});
+	};
 
 	const clearCookie = () => {
 		store.update((state) => {
@@ -67,13 +83,6 @@ const createSettingsStore = () => {
 		});
 	};
 
-	const setNoteLocationFolder = (value: string) => {
-		store.update((state) => {
-			state.noteLocation = value;
-			return state;
-		});
-	};
-
 	const clearLastTimeSynced = () => {
 		store.update((state) => {
 			state.lastTimeSynced = [];
@@ -93,9 +102,10 @@ const createSettingsStore = () => {
 		initialize,
 		actions: {
 			setNoteLocationFolder,
-			setCookie,
-			setUser,
+			setHost,
 			clearCookie,
+			setCookie,
+			setUser,			
 			clearLastTimeSynced,
 			setLastTimeSynced,
 		}

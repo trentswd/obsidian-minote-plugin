@@ -4,6 +4,7 @@
  * @date 2025-01-18
  */
 const { remote } = require('electron');
+import { get } from 'svelte/store';
 
 import { settingsStore } from '../settings';
 import { MinoteSettingTab } from '../settingTab';
@@ -32,7 +33,7 @@ export default class MinoteRefreshCookieModel {
 		const session = webContents.session;
 
 		const cookieFilter = {
-			urls: ['https://i.mi.com/status/lite/profile?ts=*']
+			urls: [`https://${get(settingsStore).host}/status/lite/profile?ts=*`]
 		};
 		session.webRequest.onSendHeaders(cookieFilter, (details: any) => {
 			const cookie = details.requestHeaders['Cookie'];
@@ -47,7 +48,7 @@ export default class MinoteRefreshCookieModel {
 	}
 
 	async doRefreshCookie() {
-		await this.modal.loadURL('https://i.mi.com');
+		await this.modal.loadURL(`https://${get(settingsStore).host}`);
 	}
 
 	onClose() {
