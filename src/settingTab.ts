@@ -113,6 +113,18 @@ export class MinoteSettingTab extends PluginSettingTab {
 						settingsStore.actions.setNoteLocationFolder(value);
 					});
 			});
+
+		new Setting(this.containerEl)
+			.setName('标签前缀')
+			.setDesc('同步笔记时自动添加的标签前缀，例如 "小米笔记/" 会生成 "小米笔记/文件夹名" 的标签')
+			.addText((text) => {
+				return text
+					.setPlaceholder('小米笔记/')
+					.setValue(get(settingsStore).tagPrefix)
+					.onChange(async (value) => {
+						settingsStore.actions.setTagPrefix(value);
+					});
+			});
 	}
 
 	private advancedSettings(): void {

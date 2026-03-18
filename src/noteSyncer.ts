@@ -207,6 +207,9 @@ export default class NoteSyncer {
 
                 const folderNameForTag = this.folderDict[note.folderId] || '未分类';
                 const noteType = extraInfo.note_content_type || 'common';
+                const tagPrefix = get(settingsStore).tagPrefix || '小米笔记/';
+                // 确保前缀以 / 结尾
+                const normalizedPrefix = tagPrefix.endsWith('/') ? tagPrefix : tagPrefix + '/';
                 
                 // 只在原笔记有title时才添加aliases，避免使用自动生成的"无标题_ID"作为alias
                 const aliasLine = extraInfo.title ? `aliases: ["${note.title.replace(/"/g, '\\"')}"]
@@ -215,8 +218,7 @@ export default class NoteSyncer {
                 const frontmatter = `---
 ${aliasLine}type: ${noteType}
 tags:
-  - 小米导入
-  - 小米导入/${folderNameForTag}
+  - ${normalizedPrefix}${folderNameForTag}
 created: ${(window as any).moment(entry.createDate).format()}
 modified: ${(window as any).moment(entry.modifyDate).format()}
 ---

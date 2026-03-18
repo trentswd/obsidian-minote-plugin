@@ -10,6 +10,7 @@ import type { SyncInfo } from './models';
 
 interface MinotePluginSettings {
 	noteLocation: string;
+	tagPrefix: string;
 	host: string;
 	cookie: string;
 	isCookieValid: boolean;
@@ -19,6 +20,7 @@ interface MinotePluginSettings {
 
 const DEFAULT_SETTINGS: MinotePluginSettings = {
 	noteLocation: 'minote',
+	tagPrefix: '小米笔记/',
 	host: "i.mi.com",
 	cookie: '',
 	isCookieValid: false,
@@ -49,6 +51,13 @@ const createSettingsStore = () => {
 	const setNoteLocationFolder = (value: string) => {
 		store.update((state) => {
 			state.noteLocation = value;
+			return state;
+		});
+	};
+
+	const setTagPrefix = (value: string) => {
+		store.update((state) => {
+			state.tagPrefix = value;
 			return state;
 		});
 	};
@@ -103,6 +112,7 @@ const createSettingsStore = () => {
 		initialize,
 		actions: {
 			setNoteLocationFolder,
+			setTagPrefix,
 			setHost,
 			clearCookie,
 			setCookie,
