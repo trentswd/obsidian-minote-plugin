@@ -1,9 +1,9 @@
 {
 	"id": "minote-sync",
-	"name": "Minote Sync",
+	"name": "Minote Sync (Fork)",
 	"version": "0.1.7",
 	"minAppVersion": "0.15.0",
-	"description": "Sync Minote(小米笔记) into your vault.",
+	"description": "Sync Minote(小米笔记) into your vault. This is a personal fork with architectural changes.",
 	"author": "Emac Shen",
 	"authorUrl": "https://emacoo.cn",
 	"isDesktopOnly": true
