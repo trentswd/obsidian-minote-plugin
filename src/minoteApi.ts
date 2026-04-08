@@ -33,6 +33,22 @@ export default class MinoteApi {
 		return resp.json;
 	}
 
+	async fetchTodoRecords(watermark = '') {
+		const url = new URL(this.getBaseUrl() + `/todo/v1/user/records`);
+		url.searchParams.append('ts', Date.now().toString());
+		url.searchParams.append('limit', '200');
+		if (watermark) {
+			url.searchParams.append('watermark', watermark);
+		}
+		const req: RequestUrlParam = {
+			url: url.toString(),
+			method: 'GET',
+			headers: this.getHeaders()
+		};
+		const resp = await requestUrl(req);
+		return resp.json;
+	}
+
 	async fetchNoteDetails(noteId: string) {
 		const req: RequestUrlParam = {
 			url: this.getBaseUrl() + `/note/note/${noteId}/?ts=${Date.now()}`,

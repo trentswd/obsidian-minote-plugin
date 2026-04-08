@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-minote-plugin-forked",
-	"version": "0.1.0",
+	"version": "0.1.9",
 	"description": "Obsidian Minote Plugin (Fork) is a personal fork to sync Minote(小米笔记) into your Obsidian Vault.",
 	"main": "main.js",
 	"scripts": {

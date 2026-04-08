@@ -20,8 +20,9 @@ Obsidian 小米笔记同步插件是一个社区插件，用来将[小米笔记]
 ## 功能
 - 使用笔记 ID 作为文件名
 - 将小米笔记的文件夹结构转换为 Obsidian 标签
-- 支持普通笔记、手写笔记、思维导图
+- 支持普通笔记、手写笔记、思维导图和待办事项列表的同步
 - 自动转换斜体、下划线、高亮、待办列表等格式
+- 针对独立的待办事项支持以多级嵌套 Checkbox 的结构生成，并自动附加状态标签
 - 下载笔记中的图片和音频，使用 Obsidian 嵌入语法
 - 同步后的文件保持小米笔记的创建和修改时间
 - 增量更新：只同步有变化的笔记
@@ -84,8 +85,9 @@ This fork takes a different approach to note synchronization, suitable for diffe
 ## Features
 - Uses note ID as filename
 - Converts Xiaomi notes folder structure to Obsidian tags
-- Supports regular notes, handwritten notes, and mind maps
+- Supports regular notes, handwritten notes, mind maps, and todo lists
 - Converts italic, underline, highlight, checklists, etc.
+- Standalone todo tasks are grouped into hierarchical multi-level checklists with automatic status tags
 - Downloads images and audio using Obsidian embed syntax
 - Preserves creation and modification timestamps
 - Incremental updates: only syncs changed notes

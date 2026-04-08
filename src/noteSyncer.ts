@@ -11,13 +11,14 @@ import path from 'path';
 import { settingsStore } from './settings';
 import FileManager from './fileManager';
 import MinoteApi from './minoteApi';
-import type { Note, Folder, SyncInfo } from './models';
+import type { Note, Folder, SyncInfo, TodoEntity } from './models';
 
 export default class NoteSyncer {
     private app: App;
 	private fileManager: FileManager;
 	private minoteApi: MinoteApi;
 	private notes: Note[] = [];
+	private todos: TodoEntity[] = [];
 	private folders: Folder[] = [];
 	private folderDict: Record<string, string> = {};
 	private thisTimeSynced: SyncInfo[] = [];
@@ -85,15 +86,17 @@ export default class NoteSyncer {
 			settingsStore.actions.clearLastTimeSynced();
 		}
 		await this.fetchNotesAndFolders();
+		await this.fetchTodos();
 		await this.buildFolderDict(); 
-		const count = await this.syncNotes(force);
-        // 只保存笔记的同步信息
-		settingsStore.actions.setLastTimeSynced(this.thisTimeSynced.filter(s => s.type === 'note'));
-		return count;
+		const noteCount = await this.syncNotes(force);
+		const todoCount = await this.syncTodos(force);
+		settingsStore.actions.setLastTimeSynced(this.thisTimeSynced);
+		return noteCount + todoCount;
 	}
 
 	private clear(): void {
 		this.notes = [];
+		this.todos = [];
 		this.folders = [];
 		this.folderDict = {};
 		this.thisTimeSynced = [];
@@ -143,6 +146,36 @@ export default class NoteSyncer {
 				break;
 			}
 			syncTag = page.data.syncTag;
+		}
+	}
+
+	private async fetchTodos(): Promise<void> {
+		let watermark = '';
+		while (true) {
+			const page = await this.minoteApi.fetchTodoRecords(watermark);
+			if (!page.data || !page.data.records) break;
+			
+			for (const record of page.data.records) {
+				if (record.contentJson && record.contentJson.entity) {
+					const entity = record.contentJson.entity;
+					this.todos.push({
+						id: record.id,
+						title: entity.title || '',
+						content: entity.content || '',
+						plainText: entity.plainText || '',
+						listType: entity.listType || 0,
+						isFinish: entity.isFinish || (entity.is_finish ? 1 : 0),
+						modifyDate: entity.lastModifiedTime || entity.createTime || 0,
+						folderId: entity.folderId ? entity.folderId.toString() : '0',
+					});
+				}
+			}
+
+			if (!page.data.hasMore) {
+				break;
+			}
+			watermark = page.data.syncToken?.watermark || '';
+			if (!watermark) break;
 		}
 	}
 
@@ -239,6 +272,83 @@ modified: ${(window as any).moment(entry.modifyDate).format()}
 
 			} catch (err) {
 				console.error(`[Minote Plugin] 同步笔记失败: ${note.title} (${note.id})`, err);
+			}
+		}
+		return syncedCount;
+	}
+
+	private async syncTodos(force: boolean): Promise<number> {
+		let syncedCount = 0;
+		const lastSyncedTodos: Record<string, SyncInfo> = get(settingsStore).lastTimeSynced
+			.filter(item => item.type === 'todo')
+			.reduce((acc, item) => ({ ...acc, [item.id]: item }), {});
+
+		for (const todo of this.todos) {
+			try {
+				const lastSynced = lastSyncedTodos[todo.id];
+				
+				if (!force && lastSynced && todo.modifyDate <= lastSynced.syncTime) {
+					this.thisTimeSynced.push(lastSynced);
+					continue;
+				}
+
+				let displayTitle = todo.title;
+				if (!displayTitle) {
+					displayTitle = todo.plainText.substring(0, 50).trim() || '无标题待办';
+					displayTitle = displayTitle.replace(/[\r\n]+/g, ' ');
+				}
+				displayTitle = displayTitle.replace(/<[^>]+>/g, '').replace(/[\\/:*?"<>|]/g, '').trim();
+				
+				const todoFileName = `${todo.id}.md`;
+				
+				let markdownBody = '';
+				if (todo.listType === 1) {
+					let parsedContent: any = {};
+					try {
+						parsedContent = JSON.parse(todo.content);
+					} catch(e) {}
+					
+					markdownBody += `- [${todo.isFinish ? 'x' : ' '}] ${parsedContent.title || displayTitle}\n`;
+					if (parsedContent.subTodoEntities && Array.isArray(parsedContent.subTodoEntities)) {
+						for (const subItem of parsedContent.subTodoEntities) {
+							markdownBody += `  - [${subItem.isFinish ? 'x' : ' '}] ${subItem.content}\n`;
+						}
+					}
+				} else {
+					markdownBody += `- [${todo.isFinish ? 'x' : ' '}] ${todo.content}\n`;
+				}
+
+				const folderNameForTag = this.folderDict[todo.folderId] || '未分类';
+				const tagPrefix = get(settingsStore).tagPrefix || '小米笔记/';
+				const normalizedPrefix = tagPrefix.endsWith('/') ? tagPrefix : tagPrefix + '/';
+				const statusTag = todo.isFinish ? '已完成' : '未完成';
+				
+				const frontmatter = `---
+aliases: ["${displayTitle.replace(/"/g, '\\"')}"]
+type: todo
+tags:
+  - ${normalizedPrefix}待办事项/${statusTag}
+  - ${normalizedPrefix}${folderNameForTag}
+created: ${(window as any).moment(todo.modifyDate).format()}
+modified: ${(window as any).moment(todo.modifyDate).format()}
+---
+
+`;
+				
+				const finalContent = frontmatter + markdownBody;
+				await this.fileManager.saveFile(todoFileName, finalContent, todo.modifyDate, todo.modifyDate);
+				
+				syncedCount++;
+				this.thisTimeSynced.push({
+					id: todo.id,
+					type: 'todo',
+					name: displayTitle,
+					syncTime: todo.modifyDate,
+					folderName: folderNameForTag,
+				});
+
+			} catch (err) {
+				console.error(`[Minote Plugin] 同步待办失败: ${todo.title} (${todo.id})`, err);
 			}
 		}
 		return syncedCount;
