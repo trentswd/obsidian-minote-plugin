@@ -354,24 +354,26 @@ modified: ${(window as any).moment(todo.modifyDate).format()}
 		return syncedCount;
 	}
 
-    private async saveAttachmentAndGenerateLink(attachment: any, sourceNotePath: string): Promise<void> {
-        const { fileId, mimeType } = attachment;
-        const fileExt = mimeType.split('/')[1] || 'bin';
-        const attachmentFileName = `${fileId}.${fileExt}`;
-        
-        const attachmentPath = await this.app.fileManager.getAvailablePathForAttachment(
-            attachmentFileName,
-            sourceNotePath
-        );
-        
-        const existingFile = this.app.vault.getAbstractFileByPath(attachmentPath);
-        if (existingFile instanceof TFile) {
-            const link = this.app.fileManager.generateMarkdownLink(existingFile, sourceNotePath);
-            this.attachmentLinkMap.set(fileId, link);
-            return;
-        }
+	private async saveAttachmentAndGenerateLink(attachment: any, sourceNotePath: string): Promise<void> {
+		const { fileId, mimeType } = attachment;
+		const fileExt = mimeType.split('/')[1] || 'bin';
+		const attachmentFileName = `${fileId}.${fileExt}`;
+		
+		// 1. 先全局查找是否已经存在同名(相同 fileId)的附件
+		const existingFile = this.app.metadataCache.getFirstLinkpathDest(attachmentFileName, sourceNotePath);
+		if (existingFile instanceof TFile) {
+			const link = this.app.fileManager.generateMarkdownLink(existingFile, sourceNotePath);
+			this.attachmentLinkMap.set(fileId, link);
+			return;
+		}
 
-        try {
+		// 2. 如果不存在，再让 Obsidian 分配一个新的存放路径
+		const attachmentPath = await this.app.fileManager.getAvailablePathForAttachment(
+			attachmentFileName,
+			sourceNotePath
+		);
+
+		try {
             const binary = await this.minoteApi.fetchImage(fileId);
             const savedFile = await this.app.vault.createBinary(attachmentPath, binary);
             const link = this.app.fileManager.generateMarkdownLink(savedFile, sourceNotePath);
