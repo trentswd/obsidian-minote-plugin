@@ -6,7 +6,7 @@
 import { writable } from 'svelte/store';
 
 import MinotePlugin from 'main';
-import type { SyncInfo } from './models';
+import type { SyncInfo, AttachmentSyncInfo } from './models';
 
 interface MinotePluginSettings {
 	noteLocation: string;
@@ -16,6 +16,7 @@ interface MinotePluginSettings {
 	isCookieValid: boolean;
 	user: string;
 	lastTimeSynced: SyncInfo[];
+	syncedAttachments: Record<string, AttachmentSyncInfo>;
 };
 
 const DEFAULT_SETTINGS: MinotePluginSettings = {
@@ -26,6 +27,7 @@ const DEFAULT_SETTINGS: MinotePluginSettings = {
 	isCookieValid: false,
 	user: '',
 	lastTimeSynced: [],
+	syncedAttachments: {},
 };
 
 const createSettingsStore = () => {
@@ -107,6 +109,13 @@ const createSettingsStore = () => {
 		});
 	};
 
+	const setSyncedAttachments = (attachments: Record<string, AttachmentSyncInfo>) => {
+		store.update((state) => {
+			state.syncedAttachments = attachments;
+			return state;
+		});
+	};
+
 	return {
 		subscribe: store.subscribe,
 		initialize,
@@ -119,6 +128,7 @@ const createSettingsStore = () => {
 			setUser,			
 			clearLastTimeSynced,
 			setLastTimeSynced,
+			setSyncedAttachments,
 		}
 	}
 };

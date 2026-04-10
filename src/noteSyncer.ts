@@ -11,7 +11,7 @@ import path from 'path';
 import { settingsStore } from './settings';
 import FileManager from './fileManager';
 import MinoteApi from './minoteApi';
-import type { Note, Folder, SyncInfo, TodoEntity } from './models';
+import type { Note, Folder, SyncInfo, TodoEntity, AttachmentSyncInfo } from './models';
 
 export default class NoteSyncer {
     private app: App;
@@ -24,6 +24,7 @@ export default class NoteSyncer {
 	private thisTimeSynced: SyncInfo[] = [];
     private turndownService: TurndownService;
     private attachmentLinkMap: Map<string, string>;
+	private syncedAttachments: Record<string, AttachmentSyncInfo> = {};
 
 	constructor(app: App, fileManager: FileManager, minoteApi: MinoteApi) {
 		this.app = app;
@@ -82,6 +83,7 @@ export default class NoteSyncer {
 
 	public async sync(force = false): Promise<number> {
 		this.clear();
+		this.syncedAttachments = get(settingsStore).syncedAttachments || {};
 		if (force) {
 			settingsStore.actions.clearLastTimeSynced();
 		}
@@ -90,8 +92,35 @@ export default class NoteSyncer {
 		await this.buildFolderDict(); 
 		const noteCount = await this.syncNotes(force);
 		const todoCount = await this.syncTodos(force);
+		this.runAttachmentGarbageCollection();
 		settingsStore.actions.setLastTimeSynced(this.thisTimeSynced);
+		settingsStore.actions.setSyncedAttachments(this.syncedAttachments);
 		return noteCount + todoCount;
+	}
+
+	private runAttachmentGarbageCollection(): void {
+		const validNoteIds = new Set(this.thisTimeSynced.map(s => s.id));
+		
+		for (const fileId in this.syncedAttachments) {
+			const att = this.syncedAttachments[fileId];
+			
+			// 移除已经被全量或远程删除的旧笔记 ID 引用
+			att.linkedNoteIds = att.linkedNoteIds.filter(id => validNoteIds.has(id));
+			
+			// 如果没有任何有效笔记引用此附件，标记其为孤岛
+			if (att.linkedNoteIds.length === 0) {
+				att.isDeleted = true;
+			}
+		}
+	}
+
+	private purgeNoteFromAttachments(noteId: string): void {
+		for (const fileId in this.syncedAttachments) {
+			const att = this.syncedAttachments[fileId];
+			if (att.linkedNoteIds.includes(noteId)) {
+				att.linkedNoteIds = att.linkedNoteIds.filter(id => id !== noteId);
+			}
+		}
 	}
 
 	private clear(): void {
@@ -209,6 +238,8 @@ export default class NoteSyncer {
 					continue;
 				}
 
+				this.purgeNoteFromAttachments(note.id);
+
 				const noteFileName = `${note.id}.md`;
                 const noteFilePath = path.join(get(settingsStore).noteLocation, noteFileName);
 				
@@ -221,7 +252,7 @@ export default class NoteSyncer {
 
 				if (attachments.length > 0) {
 					const attachmentPromises = attachments.map((att: any) => 
-                        this.saveAttachmentAndGenerateLink(att, noteFilePath)
+                        this.saveAttachmentAndGenerateLink(att, noteFilePath, note.id)
                     );
 					await Promise.all(attachmentPromises);
 				}
@@ -292,6 +323,8 @@ modified: ${(window as any).moment(entry.modifyDate).format()}
 					continue;
 				}
 
+				this.purgeNoteFromAttachments(todo.id);
+
 				let displayTitle = todo.title;
 				if (!displayTitle) {
 					displayTitle = todo.plainText.substring(0, 50).trim() || '无标题待办';
@@ -318,7 +351,6 @@ modified: ${(window as any).moment(entry.modifyDate).format()}
 					markdownBody += `- [${todo.isFinish ? 'x' : ' '}] ${todo.content}\n`;
 				}
 
-				const folderNameForTag = this.folderDict[todo.folderId] || '未分类';
 				const tagPrefix = get(settingsStore).tagPrefix || '小米笔记/';
 				const normalizedPrefix = tagPrefix.endsWith('/') ? tagPrefix : tagPrefix + '/';
 				const statusTag = todo.isFinish ? '已完成' : '未完成';
@@ -328,7 +360,6 @@ aliases: ["${displayTitle.replace(/"/g, '\\"')}"]
 type: todo
 tags:
   - ${normalizedPrefix}待办事项/${statusTag}
-  - ${normalizedPrefix}${folderNameForTag}
 created: ${(window as any).moment(todo.modifyDate).format()}
 modified: ${(window as any).moment(todo.modifyDate).format()}
 ---
@@ -344,7 +375,6 @@ modified: ${(window as any).moment(todo.modifyDate).format()}
 					type: 'todo',
 					name: displayTitle,
 					syncTime: todo.modifyDate,
-					folderName: folderNameForTag,
 				});
 
 			} catch (err) {
@@ -354,35 +384,80 @@ modified: ${(window as any).moment(todo.modifyDate).format()}
 		return syncedCount;
 	}
 
-	private async saveAttachmentAndGenerateLink(attachment: any, sourceNotePath: string): Promise<void> {
-		const { fileId, mimeType } = attachment;
+	private async saveAttachmentAndGenerateLink(attachment: any, sourceNotePath: string, noteId: string): Promise<void> {
+		const { fileId, mimeType, digest } = attachment;
 		const fileExt = mimeType.split('/')[1] || 'bin';
 		const attachmentFileName = `${fileId}.${fileExt}`;
 		
-		// 1. 先全局查找是否已经存在同名(相同 fileId)的附件
-		const existingFile = this.app.metadataCache.getFirstLinkpathDest(attachmentFileName, sourceNotePath);
-		if (existingFile instanceof TFile) {
-			const link = this.app.fileManager.generateMarkdownLink(existingFile, sourceNotePath);
-			this.attachmentLinkMap.set(fileId, link);
-			return;
+		let existingFile: any = null;
+		let existingPath = '';
+
+		// 1. 优先查阅字典缓存，看此附件是否历史下载过且未被用户人为删除物理文件
+		if (this.syncedAttachments[fileId]) {
+			existingPath = this.syncedAttachments[fileId].localPath;
+			if (existingPath) {
+				existingFile = this.app.vault.getAbstractFileByPath(existingPath);
+			}
 		}
 
-		// 2. 如果不存在，再让 Obsidian 分配一个新的存放路径
-		const attachmentPath = await this.app.fileManager.getAvailablePathForAttachment(
-			attachmentFileName,
-			sourceNotePath
-		);
+		// 2. 如果字典丢失或对应文件丢失，走全局 fallback 查询
+		if (!(existingFile instanceof TFile)) {
+			existingFile = this.app.metadataCache.getFirstLinkpathDest(attachmentFileName, sourceNotePath);
+		}
 
-		try {
-            const binary = await this.minoteApi.fetchImage(fileId);
-            const savedFile = await this.app.vault.createBinary(attachmentPath, binary);
-            const link = this.app.fileManager.generateMarkdownLink(savedFile, sourceNotePath);
-            this.attachmentLinkMap.set(fileId, link);
-        } catch (e) {
-            new Notice(`下载附件失败: ${fileId}`);
-            console.error(`[Minote Plugin] 下载附件失败 ${fileId}`, e);
-        }
-    }
+		let finalFileIdLink = '';
+		if (existingFile instanceof TFile) {
+			finalFileIdLink = this.app.fileManager.generateMarkdownLink(existingFile, sourceNotePath);
+			this.attachmentLinkMap.set(fileId, finalFileIdLink);
+			existingPath = existingFile.path;
+		} else {
+			// 3. 全新生成，请求 Obsidian 分配存放路径并下载
+			const attachmentPath = await this.app.fileManager.getAvailablePathForAttachment(
+				attachmentFileName,
+				sourceNotePath
+			);
+
+			try {
+				const binary = await this.minoteApi.fetchImage(fileId);
+				const savedFile = await this.app.vault.createBinary(attachmentPath, binary);
+				finalFileIdLink = this.app.fileManager.generateMarkdownLink(savedFile, sourceNotePath);
+				this.attachmentLinkMap.set(fileId, finalFileIdLink);
+				existingPath = savedFile.path;
+			} catch (e) {
+				new Notice(`下载附件失败: ${fileId}`);
+				console.error(`[Minote Plugin] 下载附件失败 ${fileId}`, e);
+				return;
+			}
+		}
+
+		// 4. 更新注册表字典 
+		if (!this.syncedAttachments[fileId]) {
+			this.syncedAttachments[fileId] = {
+				fileId,
+				localPath: existingPath,
+				digest: digest || '',
+				lastSyncTime: Date.now(),
+				linkedNoteIds: [],
+				historicalNoteIds: [],
+				isDeleted: false
+			};
+		}
+		
+		const attInfo = this.syncedAttachments[fileId];
+		
+		// 追加关联网络引用
+		if (!attInfo.linkedNoteIds.includes(noteId)) {
+			attInfo.linkedNoteIds.push(noteId);
+		}
+		if (!attInfo.historicalNoteIds.includes(noteId)) {
+			attInfo.historicalNoteIds.push(noteId);
+		}
+		
+		// 重置安全标记和确认物理路径
+		attInfo.isDeleted = false;
+		attInfo.localPath = existingPath;
+		attInfo.lastSyncTime = Date.now();
+	}
     
     private addAttachmentRules(): void {
         const createReplacement = (node: Element): string => {
